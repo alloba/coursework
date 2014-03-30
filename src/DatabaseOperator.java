@@ -28,14 +28,15 @@ public class DatabaseOperator {
         //Upon creation, load up the given text file and enter in all the words to an array.
 
         this.fileLocation = FileLocation;
-        BufferedReader fileRead = null;
 
-        try {
-            fileRead = new BufferedReader(new FileReader(FileLocation));
-        } catch (FileNotFoundException ex) {
-            System.err.print("FileNotFound");
+        File file = new File(this.fileLocation);
+        if (!file.exists()) {
+            file.createNewFile();
         }
+
         //
+        BufferedReader fileRead = new BufferedReader(new FileReader(file));
+
         //While the next line being read isn't null (EoF), add it to the arrayList
         String endFileChecker;
         endFileChecker = fileRead.readLine();
@@ -50,9 +51,6 @@ public class DatabaseOperator {
     public void Save() throws IOException {
         //save the arrayList to the file specified at class instantiation
         File file = new File(this.fileLocation);
-        if (!file.exists()) {
-            file.createNewFile();
-        }
 
         FileWriter fw = new FileWriter(file.getAbsoluteFile());
 
