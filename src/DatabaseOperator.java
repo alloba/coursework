@@ -17,6 +17,8 @@ import java.util.ArrayList;
  * @author alexl_000
  */
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DatabaseOperator {
 
@@ -41,22 +43,30 @@ public class DatabaseOperator {
         endFileChecker = fileRead.readLine();
 
         while (endFileChecker != null) {
-            wordArray.add(endFileChecker);
+            this.wordArray.add(endFileChecker);
             endFileChecker = fileRead.readLine();
         }
         fileRead.close();
     }
 
-    public void Save() throws IOException {
+    public void Save() {
         //save the arrayList to the file specified at class instantiation
         File file = new File(this.fileLocation);
 
-        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(file.getAbsoluteFile());
+        } catch (IOException ex) {
+            Logger.getLogger(DatabaseOperator.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         try (BufferedWriter bw = new BufferedWriter(fw)) {
             for (String x : this.wordArray) {
                 bw.write(x);
+                bw.write("\r");
             }
+        } catch (IOException ex) {
+            Logger.getLogger(DatabaseOperator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -1,5 +1,8 @@
 
+import java.awt.Dialog;
 import java.io.IOException;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -30,10 +33,50 @@ public class WOTD_GUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        AddWordsDialog = new javax.swing.JDialog();
+        SubmitButton = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        WordEntryForm = new javax.swing.JTextArea();
         wordSelectionLabel = new javax.swing.JLabel();
         GoButton = new javax.swing.JButton();
         dayComboBox = new javax.swing.JComboBox();
         addWordButton = new javax.swing.JButton();
+
+        AddWordsDialog.setMinimumSize(new java.awt.Dimension(400, 300));
+
+        SubmitButton.setText("Submit");
+        SubmitButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SubmitButtonActionPerformed(evt);
+            }
+        });
+
+        WordEntryForm.setColumns(20);
+        WordEntryForm.setRows(5);
+        jScrollPane2.setViewportView(WordEntryForm);
+
+        javax.swing.GroupLayout AddWordsDialogLayout = new javax.swing.GroupLayout(AddWordsDialog.getContentPane());
+        AddWordsDialog.getContentPane().setLayout(AddWordsDialogLayout);
+        AddWordsDialogLayout.setHorizontalGroup(
+            AddWordsDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(AddWordsDialogLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(AddWordsDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(AddWordsDialogLayout.createSequentialGroup()
+                        .addGap(0, 302, Short.MAX_VALUE)
+                        .addComponent(SubmitButton))
+                    .addComponent(jScrollPane2))
+                .addContainerGap())
+        );
+        AddWordsDialogLayout.setVerticalGroup(
+            AddWordsDialogLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(AddWordsDialogLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(SubmitButton)
+                .addContainerGap())
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -55,6 +98,11 @@ public class WOTD_GUI extends javax.swing.JFrame {
         dayComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" }));
 
         addWordButton.setText("Add Words");
+        addWordButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addWordButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -98,6 +146,23 @@ public class WOTD_GUI extends javax.swing.JFrame {
         wordSelectionLabel.setText(database.SelectWord(textSelection));
     }//GEN-LAST:event_GoButtonActionPerformed
 
+    private void addWordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addWordButtonActionPerformed
+        AddWordsDialog.setVisible(true);
+    }//GEN-LAST:event_addWordButtonActionPerformed
+
+    private void SubmitButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SubmitButtonActionPerformed
+        String[] wordList = WordEntryForm.getText().replaceAll("[^a-zA-Z ]", "").toLowerCase().split("\\s+");
+        ArrayList<String> workingList = new ArrayList<>();
+
+        for (String x : wordList) {
+            workingList.add(x);
+        }
+        database.AddWords(workingList);
+        database.Save();
+        AddWordsDialog.setVisible(false);
+
+    }//GEN-LAST:event_SubmitButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -136,9 +201,13 @@ public class WOTD_GUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JDialog AddWordsDialog;
     public javax.swing.JButton GoButton;
+    public javax.swing.JButton SubmitButton;
+    private javax.swing.JTextArea WordEntryForm;
     private javax.swing.JButton addWordButton;
     public javax.swing.JComboBox dayComboBox;
+    private javax.swing.JScrollPane jScrollPane2;
     public javax.swing.JLabel wordSelectionLabel;
     // End of variables declaration//GEN-END:variables
 }
