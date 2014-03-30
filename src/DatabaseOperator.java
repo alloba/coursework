@@ -86,28 +86,26 @@ public class DatabaseOperator {
         AlpabetizeList(this.wordArray);
     }
 
-    public String SelectWord(String weekDay) {
+    public String SelectWord(String startingLetters) {
         //Take the first letter of the given string, and create a sublist of words starting with that letter.
 
-        String workingLetter = weekDay.substring(0, 1).toLowerCase();
-
+        // String workingLetter = startingLetters.substring(0, 1).toLowerCase();
         ArrayList<String> workingList = new ArrayList<>();
 
-        workingList.addAll(this.wordArray);
-        ArrayList<String> compareList = new ArrayList<>(workingList);
-
-        for (String x : compareList) {
-            //check each item in word list. if it isnt starting with the right letter, junk it.
-            if (!x.toLowerCase().startsWith(workingLetter)) {
-                workingList.remove(x);
+        for (String x : this.wordArray) {
+            // check every word. if it starts with the right letter, add it to the list.
+            if (x.startsWith(startingLetters)) {
+                workingList.add(x);
             }
         }
 
-        int endIndex = workingList.size();
-
         //randomly get one of the elements in the list and return it for use.
         Random r = new Random();
-        return workingList.get(r.nextInt(endIndex));
-
+        int endIndex = workingList.size();
+        if (workingList.size() > 0) {
+            return workingList.get(r.nextInt(endIndex));
+        } else {
+            return "No Word Found";
+        }
     }
 }

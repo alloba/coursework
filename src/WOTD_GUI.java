@@ -38,9 +38,11 @@ public class WOTD_GUI extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         WordEntryForm = new javax.swing.JTextArea();
         wordSelectionLabel = new javax.swing.JLabel();
-        GoButton = new javax.swing.JButton();
+        GoButtonCombo = new javax.swing.JButton();
         dayComboBox = new javax.swing.JComboBox();
         addWordButton = new javax.swing.JButton();
+        ManualEntryField = new javax.swing.JTextField();
+        GoButonField = new javax.swing.JButton();
 
         AddWordsDialog.setMinimumSize(new java.awt.Dimension(400, 300));
 
@@ -85,11 +87,11 @@ public class WOTD_GUI extends javax.swing.JFrame {
         wordSelectionLabel.setText("TEST");
         wordSelectionLabel.setToolTipText("");
 
-        GoButton.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        GoButton.setText("Get Word");
-        GoButton.addActionListener(new java.awt.event.ActionListener() {
+        GoButtonCombo.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        GoButtonCombo.setText("Get Word");
+        GoButtonCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                GoButtonActionPerformed(evt);
+                GoButtonComboActionPerformed(evt);
             }
         });
 
@@ -104,23 +106,35 @@ public class WOTD_GUI extends javax.swing.JFrame {
             }
         });
 
+        GoButonField.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        GoButonField.setText("Get Word");
+        GoButonField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GoButonFieldActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(dayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(GoButton))
-                    .addComponent(addWordButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(0, 92, Short.MAX_VALUE)
                 .addComponent(wordSelectionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 578, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(92, 92, 92))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(addWordButton)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(ManualEntryField)
+                            .addComponent(dayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(GoButtonCombo)
+                            .addComponent(GoButonField, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,11 +143,16 @@ public class WOTD_GUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(dayComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(GoButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(GoButtonCombo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(1, 1, 1)))
-                .addGap(41, 41, 41)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(ManualEntryField, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(GoButonField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(wordSelectionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
                 .addComponent(addWordButton)
                 .addContainerGap())
         );
@@ -141,10 +160,10 @@ public class WOTD_GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void GoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GoButtonActionPerformed
-        String textSelection = dayComboBox.getSelectedItem().toString().toLowerCase();
+    private void GoButtonComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GoButtonComboActionPerformed
+        String textSelection = dayComboBox.getSelectedItem().toString().toLowerCase().substring(0, 1);
         wordSelectionLabel.setText(database.SelectWord(textSelection));
-    }//GEN-LAST:event_GoButtonActionPerformed
+    }//GEN-LAST:event_GoButtonComboActionPerformed
 
     private void addWordButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addWordButtonActionPerformed
         AddWordsDialog.setVisible(true);
@@ -162,6 +181,11 @@ public class WOTD_GUI extends javax.swing.JFrame {
         AddWordsDialog.setVisible(false);
 
     }//GEN-LAST:event_SubmitButtonActionPerformed
+
+    private void GoButonFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GoButonFieldActionPerformed
+        String entryText = ManualEntryField.getText();
+        wordSelectionLabel.setText(database.SelectWord(entryText));
+    }//GEN-LAST:event_GoButonFieldActionPerformed
 
     /**
      * @param args the command line arguments
@@ -202,7 +226,9 @@ public class WOTD_GUI extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDialog AddWordsDialog;
-    public javax.swing.JButton GoButton;
+    public javax.swing.JButton GoButonField;
+    public javax.swing.JButton GoButtonCombo;
+    public javax.swing.JTextField ManualEntryField;
     public javax.swing.JButton SubmitButton;
     private javax.swing.JTextArea WordEntryForm;
     private javax.swing.JButton addWordButton;
