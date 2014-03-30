@@ -102,6 +102,7 @@ public class DatabaseOperator {
         //randomly get one of the elements in the list and return it for use.
         Random r = new Random();
         int endIndex = workingList.size();
+
         if (workingList.size() > 0) {
             return workingList.get(r.nextInt(endIndex));
         } else {
