@@ -15,6 +15,8 @@ public class WOTD_GUI extends javax.swing.JFrame {
     /**
      * Creates new form WOTD_GUI
      */
+    static DatabaseOperator database;
+
     public WOTD_GUI() {
         initComponents();
     }
@@ -42,6 +44,11 @@ public class WOTD_GUI extends javax.swing.JFrame {
 
         GoButton.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         GoButton.setText("Get Word");
+        GoButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                GoButtonActionPerformed(evt);
+            }
+        });
 
         dayComboBox.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         dayComboBox.setMaximumRowCount(7);
@@ -86,6 +93,11 @@ public class WOTD_GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void GoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_GoButtonActionPerformed
+        String textSelection = dayComboBox.getSelectedItem().toString().toLowerCase();
+        wordSelectionLabel.setText(database.SelectWord(textSelection));
+    }//GEN-LAST:event_GoButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -113,7 +125,7 @@ public class WOTD_GUI extends javax.swing.JFrame {
         }
         //</editor-fold>
 
-        DatabaseOperator database = new DatabaseOperator("WordList.txt");
+        database = new DatabaseOperator("WordList.txt");
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {

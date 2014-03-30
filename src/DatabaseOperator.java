@@ -2,7 +2,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -80,22 +79,25 @@ public class DatabaseOperator {
     public String SelectWord(String weekDay) {
         //Take the first letter of the given string, and create a sublist of words starting with that letter.
 
-        String workingLetter = weekDay.substring(0, 0).toLowerCase();
+        String workingLetter = weekDay.substring(0, 1).toLowerCase();
+
         ArrayList<String> workingList = new ArrayList<>();
 
         workingList.addAll(this.wordArray);
+        ArrayList<String> compareList = new ArrayList<>(workingList);
 
-        for (String x : workingList) {
+        for (String x : compareList) {
             //check each item in word list. if it isnt starting with the right letter, junk it.
             if (!x.toLowerCase().startsWith(workingLetter)) {
                 workingList.remove(x);
             }
         }
 
-        int endIndex = workingList.size() - 1;
+        int endIndex = workingList.size();
+
         //randomly get one of the elements in the list and return it for use.
-        Random r;
-        r = new Random();
+        Random r = new Random();
         return workingList.get(r.nextInt(endIndex));
+
     }
 }
