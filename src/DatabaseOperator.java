@@ -25,12 +25,17 @@ public class DatabaseOperator {
     public ArrayList<String> wordArray = new ArrayList<>();
     String fileLocation;
 
+    File pathFile;
+
     public DatabaseOperator(String FileLocation) throws IOException {
         //Upon creation, load up the given text file and enter in all the words to an array.
 
         this.fileLocation = FileLocation;
 
-        File file = new File(this.fileLocation);
+        System.out.println(new File(DatabaseOperator.class.getProtectionDomain().getCodeSource().getLocation().getPath() + FileLocation));
+        File file = new File(DatabaseOperator.class.getProtectionDomain().getCodeSource().getLocation().getPath() + FileLocation);
+        this.pathFile = file;
+
         if (!file.exists()) {
             file.createNewFile();
         }
@@ -51,11 +56,10 @@ public class DatabaseOperator {
 
     public void Save() {
         //save the arrayList to the file specified at class instantiation
-        File file = new File(this.fileLocation);
 
         FileWriter fw = null;
         try {
-            fw = new FileWriter(file.getAbsoluteFile());
+            fw = new FileWriter(this.pathFile);
         } catch (IOException ex) {
             Logger.getLogger(DatabaseOperator.class.getName()).log(Level.SEVERE, null, ex);
         }
