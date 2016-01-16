@@ -1,36 +1,7 @@
-import itertools
-
 puzzlewidth = 9
 puzzleheight = 9
 puzzlesize = puzzlewidth * puzzleheight
-puzzle = []
-
-'''
-"EASY"
-
-rawpuzzleinput = """0 0 0 0 4 0 9 0 0
-0 8 0 6 7 0 0 0 0
-9 0 2 8 0 0 4 0 0
-0 9 1 0 0 0 0 0 0
-0 4 0 3 6 0 0 0 2
-0 0 0 0 0 0 5 0 4
-0 0 0 0 0 0 7 0 1
-0 2 8 0 0 1 0 3 0
-1 0 3 7 0 6 8 0 0"""
-'''
-
-
-"MEDIUM"
-
-rawpuzzleinput = """0 0 0 0 0 0 0 0 0
-0 0 9 0 0 3 1 0 0
-0 0 4 9 0 0 5 0 7
-4 0 0 0 9 0 0 0 0
-0 0 3 0 6 1 9 0 0
-0 0 0 0 7 0 0 4 6
-0 0 0 1 0 0 8 0 0
-0 6 0 0 0 0 0 0 0
-2 7 0 0 0 0 0 3 0"""
+puzzles = []
 
 def displaypuzzle(puzzlelist):
     displaystring = '---------------------------------\n'
@@ -55,23 +26,34 @@ def displaypuzzle(puzzlelist):
         if z > 26:
             displaystring += '---------------------------------\n'
             z = 0
-    print(displaystring)
+    print(displaystring[:-1]) # get rid of the last character, which is a newline. its just to make it look nicer when printing
 
 
-def gatherinput():
+def gatherinput(filename):
     # take input from a file, with directory specified below.
     # ideally, correct format should be "[num][space][num][space].....[num][newline] * 9"
-    file = open("C:\\CourseWork\\AI\\Sudoku\\sudoku.txt")
-    puzzlein = file.read()
-    formattedpuzzle = []
 
-    processingpuzzle = puzzlein.replace('\t', ',').replace('\n', ',').replace(' ', ',').split(',')
-    for cell in processingpuzzle:
-            if cell == '':
-                formattedpuzzle.append(0)
-            else:
-                formattedpuzzle.append(int(cell))
+    # can take more than one puzzle from the file
+    # MAKE SURE each puzzle is separated by ONE blank line ONLY
+
+    file = open(filename)
+    puzzlein = file.read()
+
+    processingpuzzle = puzzlein.split('\n\n')
+    formattedpuzzle = [[]]*len(processingpuzzle)
+
+    for i in range(len(processingpuzzle)):
+        processingpuzzle[i] = processingpuzzle[i].replace('\t', ',').replace('\n', ',').replace(' ', ',').split(',')
+
+    for i in range(len(processingpuzzle)):
+        for cell in processingpuzzle[i]:
+                if cell == '':
+                    formattedpuzzle[i].append(0)
+                else:
+                    formattedpuzzle[i].append(int(cell))
+
     return formattedpuzzle
+
 
 def getrowindexes(index):
     row = []
@@ -82,7 +64,7 @@ def getrowindexes(index):
     return row
 
 
-def getrowvalues(index):
+def getrowvalues(index, puzzle):
     row = []
     rowcall = index//puzzlewidth
 
@@ -100,7 +82,7 @@ def getcolumnindexes(index):
     return column
 
 
-def getcolumnvalues(index):
+def getcolumnvalues(index, puzzle):
     column = []
     colcall = index % puzzlewidth
 
@@ -120,7 +102,7 @@ def getboxindexes(index):
     return box
 
 
-def getboxvalues(index):
+def getboxvalues(index, puzzle):
     # what a gross bit of math. so the bit inside the parenthesis is to get either the row or column.
     # divide each by 3 to deal with having the boxes being 9 by 9
 
@@ -133,20 +115,21 @@ def getboxvalues(index):
             box.append(puzzle[i])
     return box
 
-def findpossiblevalues(index):
+
+def findpossiblevalues(index, puzzle):
         # for a given index, find what could possibly go there, based on what exists in the row/column/box of the cell
         possibles = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         for i in range(1,10):
-            if i in getboxvalues(index) or i in getcolumnvalues(index) or i in getrowvalues(index):
+            if i in getboxvalues(index, puzzle) or i in getcolumnvalues(index, puzzle) or i in getrowvalues(index, puzzle):
                 possibles.remove(i)
         return possibles
 
 
-def validatepuzzle():
+def validatepuzzle(puzzle):
     for i in range(81):
-        row = getrowvalues(i)
-        column = getcolumnvalues(i)
-        box = getboxvalues(i)
+        row = getrowvalues(i, puzzle)
+        column = getcolumnvalues(i, puzzle)
+        box = getboxvalues(i, puzzle)
 
         # convert each to a set and compare lengths.
         # since sets don't have repeats, this will point out if any conflicts exist
@@ -155,41 +138,37 @@ def validatepuzzle():
         return True
 
 
-def makeallguesses():
+def makeallguesses(puzzle):
     # expect results to be reported as booleans in order to keep track of how many numbers are found
     simplecellsfound = 0
     singleinferencecellsfound = 0
 
     while True:
         holdingpuzzle = puzzle[:]
-        if simpleguess():
+        if simpleguess(puzzle):
             simplecellsfound += 1
-        if singleinferenceguess():
-            singleinferencecellsfound +=1
+        if singleinferenceguess(puzzle):
+            singleinferencecellsfound += 1
         if holdingpuzzle == puzzle:
-            break
-    print(simplecellsfound)
-    print(singleinferencecellsfound)
+            return "SimpleGuesses: " + str(simplecellsfound) + "\n" + "SingleInferenceGuesses: " + str(singleinferencecellsfound)
 
 
-def simpleguess():
+def simpleguess(puzzle):
     # makes guesses by just seeing if any cells have only 1 possibility
 
     for i in range(81):
-        if len(findpossiblevalues(i)) == 1 and puzzle[i] == 0:
-            puzzle[i] = findpossiblevalues(i)[0]
+        if len(findpossiblevalues(i, puzzle)) == 1 and puzzle[i] == 0:
+            puzzle[i] = findpossiblevalues(i, puzzle)[0]
             return True
     return False
 
 
-def singleinferenceguess():
+def singleinferenceguess(puzzle):
     # tries to fill in values based on a cell being the only one in a box/row/column that can actually have a value
     # (only one cell has a particular possible value in a group)
 
     # man this code is gross and long. and who really knows if it works?
     #############
-
-
 
     for i in range(81):
         # all items in the row/col/box that are 0 (modified in the next section to make this the case)
@@ -217,15 +196,15 @@ def singleinferenceguess():
         # prepare lists that contain all values that each cell in the row/col/box could possibly be
         possiblerowvalues = []
         for index in row:
-            possiblerowvalues.append(findpossiblevalues(index))
+            possiblerowvalues.append(findpossiblevalues(index, puzzle))
 
         possiblecolumnvalues = []
         for index in column:
-            possiblecolumnvalues.append(findpossiblevalues(index))
+            possiblecolumnvalues.append(findpossiblevalues(index, puzzle))
 
         possibleboxvalues = []
         for index in box:
-            possibleboxvalues.append(findpossiblevalues(index))
+            possibleboxvalues.append(findpossiblevalues(index, puzzle))
 
         # turn all the 2D lists into 1D
         possiblerowvalues = [x for sublist in possiblerowvalues for x in sublist]
@@ -234,7 +213,7 @@ def singleinferenceguess():
 
         ###
 
-        for value in findpossiblevalues(i):
+        for value in findpossiblevalues(i, puzzle):
             if possiblerowvalues.count(value) == 1 and puzzle[i] == 0:
                 puzzle[i] = value
                 return True
@@ -246,10 +225,13 @@ def singleinferenceguess():
                 return True
     return False
 
-puzzle = gatherinput()
+puzzles = gatherinput("C:\\CourseWork\\AI\\Sudoku\\sudoku.txt")
+for puzzle in puzzles:
+    print(makeallguesses(puzzle))
+    displaypuzzle(puzzle)
 
-displaypuzzle(puzzle)
-makeallguesses()
-displaypuzzle(puzzle)
-print(validatepuzzle())
+    if validatepuzzle(puzzle):
+        print("Valid\n\n") # the newlines are just to get it to print nicely
+    else:
+        print("Not Valid\n\n")
 
