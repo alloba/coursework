@@ -1,3 +1,5 @@
+import sys, getopt
+
 puzzlewidth = 9
 puzzleheight = 9
 puzzlesize = puzzlewidth * puzzleheight
@@ -40,17 +42,19 @@ def gatherinput(filename):
     puzzlein = file.read()
 
     processingpuzzle = puzzlein.split('\n\n')
-    formattedpuzzle = [[]]*len(processingpuzzle)
+    formattedpuzzle = []
 
     for i in range(len(processingpuzzle)):
         processingpuzzle[i] = processingpuzzle[i].replace('\t', ',').replace('\n', ',').replace(' ', ',').split(',')
 
     for i in range(len(processingpuzzle)):
+        addlist = []
         for cell in processingpuzzle[i]:
-                if cell == '':
-                    formattedpuzzle[i].append(0)
+                if cell == 0:
+                    addlist.append(0)
                 else:
-                    formattedpuzzle[i].append(int(cell))
+                    addlist.append(int(cell))
+        formattedpuzzle.append(addlist)
 
     return formattedpuzzle
 
@@ -138,17 +142,25 @@ def validatepuzzle(puzzle):
         return True
 
 
-def makeallguesses(puzzle):
+def makeallguesses(puzzle, level):
     # expect results to be reported as booleans in order to keep track of how many numbers are found
+    # to only solve with certain levels of algorithm, fill optional parameter "level". defaults to easy only.
     simplecellsfound = 0
     singleinferencecellsfound = 0
 
     while True:
         holdingpuzzle = puzzle[:]
-        if simpleguess(puzzle):
-            simplecellsfound += 1
-        if singleinferenceguess(puzzle):
-            singleinferencecellsfound += 1
+
+        if level == 'easy':
+            if simpleguess(puzzle):
+                simplecellsfound += 1
+
+        if level == 'medium':
+            if simpleguess(puzzle):
+                simplecellsfound += 1
+            if singleinferenceguess(puzzle):
+                singleinferencecellsfound += 1
+
         if holdingpuzzle == puzzle:
             return "SimpleGuesses: " + str(simplecellsfound) + "\n" + "SingleInferenceGuesses: " + str(singleinferencecellsfound)
 
@@ -225,13 +237,15 @@ def singleinferenceguess(puzzle):
                 return True
     return False
 
-puzzles = gatherinput("C:\\CourseWork\\AI\\Sudoku\\sudoku.txt")
+puzzles = gatherinput("C:\\CourseWork\\AI\\Sudoku\\sudoku_easy.txt")
 for puzzle in puzzles:
-    print(makeallguesses(puzzle))
+    print(makeallguesses(puzzle, "medium"))
     displaypuzzle(puzzle)
 
     if validatepuzzle(puzzle):
-        print("Valid\n\n") # the newlines are just to get it to print nicely
+        print("Valid\n\n")  # the newlines are just to get it to print nicely
     else:
         print("Not Valid\n\n")
+
+
 
