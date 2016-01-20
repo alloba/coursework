@@ -1,9 +1,9 @@
-import sys, getopt
-
+#These variables are rarely used, to the point that they could be defined each instance, but this helps my sanity
 puzzlewidth = 9
 puzzleheight = 9
 puzzlesize = puzzlewidth * puzzleheight
 puzzles = []
+
 
 def displaypuzzle(puzzlelist):
     displaystring = '---------------------------------\n'
@@ -32,16 +32,18 @@ def displaypuzzle(puzzlelist):
 
 
 def gatherinput(filename):
-    # take input from a file, with directory specified below.
-    # ideally, correct format should be "[num][space][num][space].....[num][newline] * 9"
+    """
+     take input from a file, with directory specified as a parameter.
+     ideally, correct format should be "[num][space][num][space].....[num][newline] * 9"
 
-    # can take more than one puzzle from the file
-    # MAKE SURE each puzzle is separated by ONE blank line ONLY
+     can take more than one puzzle from the file
+     MAKE SURE each puzzle is separated by ONE blank line ONLY.
+    """
 
     file = open(filename)
     puzzlein = file.read()
 
-    processingpuzzle = puzzlein.split('\n\n')
+    processingpuzzle = puzzlein.split('\n\n')  # get each individual puzzle in the file
     formattedpuzzle = []
 
     for i in range(len(processingpuzzle)):
@@ -60,6 +62,10 @@ def gatherinput(filename):
 
 
 def getrowindexes(index):
+
+    """
+    given an index, return a list of all indexes in that row.
+    """
     row = []
     rowcall = index//puzzlewidth
 
@@ -69,6 +75,9 @@ def getrowindexes(index):
 
 
 def getrowvalues(index, puzzle):
+    """
+    given an index and a puzzle to work with, return every value that exists on that row in that puzzle
+    """
     row = []
     rowcall = index//puzzlewidth
 
@@ -96,6 +105,7 @@ def getcolumnvalues(index, puzzle):
 
 
 def getboxindexes(index):
+    # a box being the 9 x 9 configuration in puzzles. ninette, square, box, whatever name you want.
     box = []
     boxrow = (index // puzzlewidth) // 3
     boxcolumn = (index % puzzlewidth) // 3
@@ -107,8 +117,9 @@ def getboxindexes(index):
 
 
 def getboxvalues(index, puzzle):
-    # what a gross bit of math. so the bit inside the parenthesis is to get either the row or column.
-    # divide each by 3 to deal with having the boxes being 9 by 9
+    # what a simple bit of that that i just flat out couldnt come up with.
+    # so the bit inside the parenthesis is to get either the row or column.
+    # divide each by 3 to deal with having the boxes being 3 by 3
 
     box = []
     boxrow = (index // puzzlewidth) // 3
@@ -121,7 +132,10 @@ def getboxvalues(index, puzzle):
 
 
 def findpossiblevalues(index, puzzle):
-        # for a given index, find what could possibly go there, based on what exists in the row/column/box of the cell
+        """
+        for a given index, in a puzzle,
+        find what could possibly go there based on what exists in the row/column/box of the cell
+        """
         possibles = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         for i in range(1,10):
             if i in getboxvalues(index, puzzle) or i in getcolumnvalues(index, puzzle) or i in getrowvalues(index, puzzle):
@@ -130,6 +144,10 @@ def findpossiblevalues(index, puzzle):
 
 
 def validatepuzzle(puzzle):
+    """
+    make sure the puzzle is correct.
+    everything filled in, no repeated values (really just no repeated values accomplishes both goals)
+    """
     for i in range(81):
         row = getrowvalues(i, puzzle)
         column = getcolumnvalues(i, puzzle)
@@ -143,8 +161,11 @@ def validatepuzzle(puzzle):
 
 
 def makeallguesses(puzzle, level):
-    # expect results to be reported as booleans in order to keep track of how many numbers are found
-    # to only solve with certain levels of algorithm, fill optional parameter "level". defaults to easy only.
+    """
+    expect results to be reported as booleans in order to keep track of how many numbers are found
+    to only solve with certain levels of algorithm, fill optional parameter "level".
+    options are 'easy', 'medium', or 'medium_easy' to combine techniques.
+    """
     simplecellsfound = 0
     singleinferencecellsfound = 0
 
@@ -155,9 +176,13 @@ def makeallguesses(puzzle, level):
             if simpleguess(puzzle):
                 simplecellsfound += 1
 
-        if level == 'medium':
+        if level == 'medium_easy':
             if simpleguess(puzzle):
                 simplecellsfound += 1
+            if singleinferenceguess(puzzle):
+                singleinferencecellsfound += 1
+
+        if level == "medium":
             if singleinferenceguess(puzzle):
                 singleinferencecellsfound += 1
 
@@ -166,7 +191,10 @@ def makeallguesses(puzzle, level):
 
 
 def simpleguess(puzzle):
-    # makes guesses by just seeing if any cells have only 1 possibility
+    """
+    makes guesses by just seeing if any cells have only 1 possibility
+    just makes use of the 'findpossiblevalues' function really
+    """
 
     for i in range(81):
         if len(findpossiblevalues(i, puzzle)) == 1 and puzzle[i] == 0:
@@ -176,11 +204,12 @@ def simpleguess(puzzle):
 
 
 def singleinferenceguess(puzzle):
-    # tries to fill in values based on a cell being the only one in a box/row/column that can actually have a value
-    # (only one cell has a particular possible value in a group)
+    """
+    tries to fill in values based on a cell being the only one in a box/row/column that can actually have a value
+    (only one cell has a particular possible value in a group)
 
-    # man this code is gross and long. and who really knows if it works?
-    #############
+    man this code is gross and long. and who really knows if it works? Update: totally works
+    """
 
     for i in range(81):
         # all items in the row/col/box that are 0 (modified in the next section to make this the case)
@@ -237,15 +266,13 @@ def singleinferenceguess(puzzle):
                 return True
     return False
 
-puzzles = gatherinput("C:\\CourseWork\\AI\\Sudoku\\sudoku_easy.txt")
+# Finally, the bit that executes, after all those functions.
+puzzles = gatherinput("C:\\CourseWork\\AI\\Sudoku\\sudoku_hard.txt")
 for puzzle in puzzles:
-    print(makeallguesses(puzzle, "medium"))
+    print(makeallguesses(puzzle, "medium_easy"))
     displaypuzzle(puzzle)
 
     if validatepuzzle(puzzle):
         print("Valid\n\n")  # the newlines are just to get it to print nicely
     else:
         print("Not Valid\n\n")
-
-
-
