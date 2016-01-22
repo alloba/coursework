@@ -267,12 +267,28 @@ def singleinferenceguess(puzzle):
     return False
 
 # Finally, the bit that executes, after all those functions.
-puzzles = gatherinput("C:\\CourseWork\\AI\\Sudoku\\sudoku_hard.txt")
+
+
+def getfilelocation():
+    global puzzles
+    try:
+        filelocation = input("Enter Puzzle File Location:\n")
+        puzzles = gatherinput(filelocation)
+    except FileNotFoundError:
+        print("File Not Found\n")
+        getfilelocation()
+
+
+getfilelocation()
+method = input("Enter Level of Method to Solve (easy, medium, medium_easy):\n")
+
 for puzzle in puzzles:
-    print(makeallguesses(puzzle, "medium_easy"))
+    print(makeallguesses(puzzle, method))
     displaypuzzle(puzzle)
 
     if validatepuzzle(puzzle):
         print("Valid\n\n")  # the newlines are just to get it to print nicely
     else:
         print("Not Valid\n\n")
+
+input("Press Enter to Exit the Program :::")
