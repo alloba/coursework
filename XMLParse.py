@@ -10,13 +10,13 @@ class Node:
 
 
     def __str__(self,level=1):
-        returnstring = ""
+        returnstring = "----"
         returnstring += "Name: " + self.Name + '\n'
-        returnstring += ('\t' * level) + "Behav: " + str(self.Behavior) + '\n'
-        returnstring += ('\t' * level) + "Resp: " + str(self.Response) + '\n'
-        returnstring += ('\t' * level) + "Cont: " + str(self.Content) + '\n'
+        returnstring += ('\t' * level) + "|" + "Behav: " + str(self.Behavior) + '\n'
+        returnstring += ('\t' * level) +"|" + "Resp: " + str(self.Response) + '\n'
+        #returnstring += ('\t' * level) +"|" + "Cont: " + str(self.Content) + '\n'
 
-        returnstring += ("\t" * level) + "Children:\n"
+        returnstring += ("\t" * level) +"|" + "Children:\n" #+ ('\t' )
 
         for child in self.Children:
             returnstring += ('\t' * level) + child.__str__(level+1)
@@ -39,12 +39,13 @@ class Node:
 class XMLTree():
     """Process a given XML File. Takes File location of XML as string"""
 
-    #XMLText = ""
-    #root = None
     def __init__(self, filelocation):
         self.XMLText = open(filelocation).read()
         self.process(self.XMLText, None)
         self.sanitize(self.depthfirst())
+
+    def __str__(self):
+        return self.root.__str__()
 
     def process(self, text, parent=None):
         workingNode = Node()
@@ -85,8 +86,9 @@ class XMLTree():
             node.Content = node.Content.split(' ', 1)[1]
 
             if node.Name != 'root':  # the root node is a special flower, so exclude it
-                node.Behavior += node.Content.split("behavior", 1)[1].split('response')[0].split("=")[1].strip()
+                node.Behavior += node.Content.split("behavior")[1].split('response')[0].split("=")[1].strip()
                 node.Response += node.Content.split("response")[1].split("=")[1]
+
                 node.Content = ""
 
 
@@ -113,5 +115,4 @@ class XMLTree():
         nodelist.append(node)
         return nodelist
 
-tree = XMLTree("C:\\CourseWork\\AI\\Project 1\\examplefile.xml")
-print(tree.root)
+
