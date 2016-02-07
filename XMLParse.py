@@ -1,3 +1,4 @@
+import random
 class Node:
     """Storage for each element in the XML Tree"""
 
@@ -79,8 +80,6 @@ class XMLTree():
 
         for node in nodelist:
             node.Content = node.Content.split('>')[0]  # gets rid of junk characters left over from creating the tree
-
-        for node in nodelist:
             node.Name = node.Content.split(' ')[0]  # pretty much always "node".
             node.Content += " "  # The split below needs a space, but not all nodes have space. so add it... it works...
             node.Content = node.Content.split(' ', 1)[1]
@@ -91,13 +90,12 @@ class XMLTree():
 
                 node.Content = ""
 
-
     def breadthfirst(self):
         nodelist = [self.root]
         nodelist = self.breadthrecurse(self.root, nodelist)
         return nodelist
 
-    def breadthrecurse(self, node, nodelist):
+    def breadthrecurse(self, node, nodelist=[]):
         for child in node.Children:
             nodelist.append(child)
         for child in node.Children:
@@ -109,10 +107,25 @@ class XMLTree():
         nodelist = []
         return self.depthrecurse(self.root, nodelist)
 
-    def depthrecurse(self, node, nodelist):
+    def depthrecurse(self, node, nodelist=[]):
         for child in node.Children:
             self.depthrecurse(child, nodelist)
         nodelist.append(node)
         return nodelist
 
+    def getresponse(self, behaviorstring):
+        behaviornode = None
+        responselist = []
+        behaviorstring = '"' + behaviorstring + '"'
+        for node in self.breadthfirst():
+            if node.Behavior == behaviorstring:
+                behaviornode = node
+                break
+        if behaviornode is None:
+            return "Not A Valid Input"
 
+        for node in self.depthrecurse(behaviornode):
+            if node.Response.replace('"', '').replace(' ', '') != '':
+                responselist.append(node)
+
+        return random.choice(responselist).Response
