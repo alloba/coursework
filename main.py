@@ -1,77 +1,57 @@
+import tkinter
+
 from XMLParse import *
-from tkinter import *
+
 from tkinter.ttk import *
+import tkinter.scrolledtext
+import tkinter.filedialog
 
-
-def window_setup():
+def mainwindow_setup():
     global window
-    window = Tk()
 
-    window.grid_columnconfigure(0, weight=1)
-    window.grid_columnconfigure(1, weight=2)
-
-    window.grid_rowconfigure(0, weight=1)
-
+    window = tkinter.Tk()
     window.title("Project 1")
-    window.geometry("500x300")
+    window.geometry('600x400')
+
+    menubar = tkinter.Menu(window)
+    menubar.add_command(label="Open New XML File", command=openfile)
+
+    window.configure(menu=menubar)
+
+def treespace_setup():
+    treespace_frame = Frame(window)
+    treespace_frame.place(relx=0.02, rely=0.02, relheight=0.96, relwidth=0.40)
+
+    tree_scrolledtext = tkinter.scrolledtext.ScrolledText(treespace_frame)
+    tree_scrolledtext.place(relx=0, rely=0, relheight=1, relwidth=1)
+    tree_scrolledtext.configure(wrap=tkinter.NONE)
 
 
-def treeview_setup():
-    global window
-    treeview_frame = Frame(window)
-
-    scrollbar_x = Scrollbar(treeview_frame, orient=HORIZONTAL)
-    scrollbar_y = Scrollbar(treeview_frame)
-
-    text_tree_frame = Frame(treeview_frame)
-    text_tree = Text(text_tree_frame, wrap=NONE, xscrollcommand=scrollbar_x.set, yscrollcommand=scrollbar_y.set)
-
-    scrollbar_x.grid(row=1, column=0, sticky='nsew')
-    scrollbar_y.grid(row=0, column=1, sticky='nsew')
-
-    text_tree_frame.grid(row=0, column=0, sticky='nsew')
-    text_tree_frame.grid_propagate(False)
-    text_tree.grid(row=0, column=0, sticky='nsew')
-
-    scrollbar_x.config(command=text_tree.xview)
-    scrollbar_y.config(command=text_tree.yview)
-
-    treeview_frame.grid(row=0, column=0, columnspan=2, sticky='nswe')
-
-    treeview_frame.grid_rowconfigure(0, weight=1)
-    treeview_frame.grid_columnconfigure(0, weight=1)
-
-    text_tree.config(state=DISABLED)
-
-
-def controlarea_setup():
+def inputarea_setup():
     global window
 
-    controlarea_frame = Frame(window)
+    input_entry = Entry(window)
+    input_entry.place(relx=0.43, rely=0.92, relheight=0.08, relwidth=0.46)
 
-    output_text_frame = Frame(controlarea_frame)
-    output_text = Text(output_text_frame)
+    submit_button = Button(window)
+    submit_button.place(relx=0.91, rely=0.92, relheight=0.09, relwidth=0.09)
 
-    input_entry = Entry(controlarea_frame)
-    submitbutton_button = Button(controlarea_frame)
-
-    output_text_frame.grid(row=0, column=0, sticky='nsew', columnspan=2)
-    output_text_frame.grid_propagate(False)
-
-    output_text.grid(row=0, column=0, sticky='nsew')
-    input_entry.grid(row=1, column=0, sticky='w')
-    submitbutton_button.grid(row=1, column=1, sticky='e')
-    controlarea_frame.grid(row=0, column=1, sticky='nse')
-
-    controlarea_frame.grid_columnconfigure(0, weight=1)
-    controlarea_frame.grid_rowconfigure(0, weight=1)
-
-#window_setup()
-#treeview_setup()
-#controlarea_setup()
-#window.mainloop()
+    outputarea_text = tkinter.Text(window)
+    outputarea_text.place(relx=0.43, rely=0.02, relheight=0.9, relwidth=0.55)
 
 
+def openfile():
+    filename = tkinter.filedialog.askopenfilename(parent=window)
+    try:
+        1+1
+    except () as e:
+        return
+
+mainwindow_setup()
+treespace_setup()
+inputarea_setup()
+
+window.mainloop()
 
 tree = XMLTree("C:/CourseWork/AI/Project 1/examplefile.xml")
 #print(tree)
