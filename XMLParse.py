@@ -11,16 +11,22 @@ class Node:
 
 
     def __str__(self,level=1):
-        returnstring = "----"
-        returnstring += "Name: " + self.Name + '\n'
-        returnstring += ('\t' * level) + "|" + "Behav: " + str(self.Behavior) + '\n'
-        returnstring += ('\t' * level) +"|" + "Resp: " + str(self.Response) + '\n'
-        #returnstring += ('\t' * level) +"|" + "Cont: " + str(self.Content) + '\n'
+        returnstring = "     " * (level-1)
+        returnstring += "-" + self.Name.capitalize() + '\n'
 
-        returnstring += ("\t" * level) +"|" + "Children:\n" #+ ('\t' )
+        if len(self.Behavior) > 2:
+            returnstring += ('    ' * level) + "|" + "Behavior: " + str(self.Behavior) + '\n'
+
+        if len(self.Response) > 3:
+            returnstring += ('    ' * level) + "|" + "Response: " + str(self.Response) + '\n'
+
+        if len(self.Children) == 0:
+            returnstring += ''
+        else:
+            returnstring += ("    " * level) +"|" + "Children:\n" + ''
 
         for child in self.Children:
-            returnstring += ('\t' * level) + child.__str__(level+1)
+            returnstring += ('' * level) + child.__str__(level+1)
 
         return returnstring
 
@@ -118,7 +124,7 @@ class XMLTree():
         responselist = []
         behaviorstring = '"' + behaviorstring + '"'
         for node in self.breadthfirst():
-            if node.Behavior == behaviorstring:
+            if node.Behavior.lower() == behaviorstring.lower():
                 behaviornode = node
                 break
         if behaviornode is None:

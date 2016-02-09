@@ -11,48 +11,92 @@ def mainwindow_setup():
 
     window = tkinter.Tk()
     window.title("Project 1")
-    window.geometry('600x400')
+    window.geometry('700x400')
+    window.configure(background='medium spring green')
 
     menubar = tkinter.Menu(window)
     menubar.add_command(label="Open New XML File", command=openfile)
-
     window.configure(menu=menubar)
 
+    window.bind('<Return>', submitinput)
+
 def treespace_setup():
+    global tree_scrolledtext, tree
     treespace_frame = Frame(window)
-    treespace_frame.place(relx=0.02, rely=0.02, relheight=0.96, relwidth=0.40)
+    treespace_frame.place(relx=0.01, rely=0.01, relheight=0.98, relwidth=0.60)
 
     tree_scrolledtext = tkinter.scrolledtext.ScrolledText(treespace_frame)
     tree_scrolledtext.place(relx=0, rely=0, relheight=1, relwidth=1)
     tree_scrolledtext.configure(wrap=tkinter.NONE)
 
+    tree_scrolledtext.config(state=tkinter.DISABLED)
+    try:
+        tree = XMLTree('examplefile.xml')
+    except FileNotFoundError:
+        return
+
 
 def inputarea_setup():
-    global window
+    global window, input_entry, outputarea_text
 
     input_entry = Entry(window)
-    input_entry.place(relx=0.43, rely=0.92, relheight=0.08, relwidth=0.46)
+    input_entry.place(relx=0.62, rely=0.91, relheight=0.08, relwidth=0.295)
 
-    submit_button = Button(window)
-    submit_button.place(relx=0.91, rely=0.92, relheight=0.09, relwidth=0.09)
+    submit_button = Button(window, text="Submit", command=submitinput)
+    submit_button.place(relx=0.92, rely=0.91, relheight=0.08, relwidth=0.075)
 
     outputarea_text = tkinter.Text(window)
-    outputarea_text.place(relx=0.43, rely=0.02, relheight=0.9, relwidth=0.55)
+    outputarea_text.place(relx=0.62, rely=0.01, relheight=0.89, relwidth=0.375)
+
+
+def submitinput(junk=0):
+    global input_entry, outputarea_text
+    text = input_entry.get()
+
+    if len(text) > 0:
+        try:
+            text = '>>> ' + input_entry.get() + '\n' + tree.getresponse(input_entry.get()) + '\n\n'
+            input_entry.delete(0, tkinter.END)
+            outputarea_text.insert(tkinter.END, text)
+        except NameError:
+            outputarea_text.insert(tkinter.END, "*No XML File Loaded*" + '\n\n')
+            input_entry.delete(0, tkinter.END)
+        outputarea_text.see(tkinter.END)
 
 
 def openfile():
+    global filename, tree, outputarea_text
     filename = tkinter.filedialog.askopenfilename(parent=window)
-    try:
-        1+1
-    except () as e:
-        return
+    if '.xml' in filename.lower():
+        try:
+            tree = XMLTree(filename)
+            updatetree()
+        except () as e:
+            return
+    else:
+        outputarea_text.insert(tkinter.END, "Not a valid file" + '\n\n')
+
+
+
+def updatetree():
+    global tree_scrolledtext, outputarea_text
+    tree_scrolledtext.config(state=tkinter.NORMAL)
+    tree_scrolledtext.delete(1.0, tkinter.END)
+    tree_scrolledtext.insert(1.0, str(tree))
+    tree_scrolledtext.config(state=tkinter.DISABLED)
+    outputarea_text.delete(1.0, tkinter.END)
 
 mainwindow_setup()
 treespace_setup()
 inputarea_setup()
 
+try:
+    updatetree()
+except NameError:
+    None
+
 window.mainloop()
 
-tree = XMLTree("C:/CourseWork/AI/Project 1/examplefile.xml")
+#tree = XMLTree(filename)
 #print(tree)
 #print(tree.getresponse("Ranged"))
