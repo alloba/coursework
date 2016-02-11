@@ -6,6 +6,7 @@ from tkinter.ttk import *
 import tkinter.scrolledtext
 import tkinter.filedialog
 
+
 def mainwindow_setup():
     global window
 
@@ -19,6 +20,7 @@ def mainwindow_setup():
     window.configure(menu=menubar)
 
     window.bind('<Return>', submitinput)
+
 
 def treespace_setup():
     global tree_scrolledtext, tree
@@ -41,6 +43,7 @@ def inputarea_setup():
 
     input_entry = Entry(window)
     input_entry.place(relx=0.62, rely=0.91, relheight=0.08, relwidth=0.295)
+    input_entry.focus_set()
 
     submit_button = Button(window, text="Submit", command=submitinput)
     submit_button.place(relx=0.92, rely=0.91, relheight=0.08, relwidth=0.075)
@@ -77,7 +80,6 @@ def openfile():
         outputarea_text.insert(tkinter.END, "Not a valid file" + '\n\n')
 
 
-
 def updatetree():
     global tree_scrolledtext, outputarea_text
     tree_scrolledtext.config(state=tkinter.NORMAL)
@@ -96,7 +98,3 @@ except NameError:
     None
 
 window.mainloop()
-
-#tree = XMLTree(filename)
-#print(tree)
-#print(tree.getresponse("Ranged"))

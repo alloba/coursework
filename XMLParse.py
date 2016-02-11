@@ -1,4 +1,6 @@
 import random
+
+
 class Node:
     """Storage for each element in the XML Tree"""
 
@@ -43,13 +45,13 @@ class Node:
         self.Content += element
 
 
-class XMLTree():
+class XMLTree:
     """Process a given XML File. Takes File location of XML as string"""
 
     def __init__(self, filelocation):
         self.XMLText = open(filelocation).read()
         self.process(self.XMLText, None)
-        self.sanitize(self.depthfirst())
+        self.sanitize(self.buildnodelist(self.root))
 
     def __str__(self):
         return self.root.__str__()
@@ -96,42 +98,75 @@ class XMLTree():
 
                 node.Content = ""
 
-    def breadthfirst(self):
-        nodelist = [self.root]
-        nodelist = self.breadthrecurse(self.root, nodelist)
+    def buildnodelist(self, node):
+        if node == None:
+            return []
+        nodelist = self.buildnodelistrecurse(node, [])
         return nodelist
 
-    def breadthrecurse(self, node, nodelist=[]):
+    def buildnodelistrecurse(self, node, nodelist):
+        bnodelist=nodelist
+        if node not in bnodelist:
+            bnodelist.append(node)
         for child in node.Children:
-            nodelist.append(child)
+            self.buildnodelistrecurse(child, bnodelist)
+
+        return bnodelist
+
+    def breadthfirst(self, behaviorstring):
+        global breadthnode, breadthcount
+        breadthnode = None
+        breadthcount = 1
+        return self.breadthrecurse(self.root, behaviorstring)
+
+    def breadthrecurse(self, node, behaviorstring, foundnode=None):
+        global breadthnode, breadthcount
+
         for child in node.Children:
-            self.breadthrecurse(child, nodelist)
+            if child.Behavior.lower() == behaviorstring.lower():
+                breadthnode = child
 
-        return nodelist
+            if breadthnode is not None:
+                break
+            else:
+                breadthcount += 1
 
-    def depthfirst(self):
-        nodelist = []
-        return self.depthrecurse(self.root, nodelist)
-
-    def depthrecurse(self, node, nodelist=[]):
         for child in node.Children:
-            self.depthrecurse(child, nodelist)
-        nodelist.append(node)
-        return nodelist
+            self.breadthrecurse(child, behaviorstring, breadthnode)
+        return breadthnode, breadthcount
+
+    def depthfirst(self, behaviorstring):
+        global depthnode, depthcount
+        depthnode = None
+        depthcount = 0
+        return self.depthrecurse(self.root, behaviorstring)
+
+    def depthrecurse(self, node, behaviorstring):
+        global depthnode, depthcount
+        if behaviorstring.lower() == node.Behavior.lower():
+            depthnode = node
+        for child in node.Children:
+            if depthnode is not None:
+                break
+            depthcount += 1
+            self.depthrecurse(child, behaviorstring)
+        return depthnode, depthcount
 
     def getresponse(self, behaviorstring):
-        behaviornode = None
         responselist = []
         behaviorstring = '"' + behaviorstring + '"'
-        for node in self.breadthfirst():
-            if node.Behavior.lower() == behaviorstring.lower():
-                behaviornode = node
-                break
-        if behaviornode is None:
-            return "Not A Valid Input"
 
-        for node in self.depthrecurse(behaviornode):
+        breadthnode, breadthcount = self.breadthfirst(behaviorstring)
+        depthnode, depthcount = self.depthfirst(behaviorstring)
+
+        for node in self.buildnodelist(breadthnode)[1:]:
             if node.Response.replace('"', '').replace(' ', '') != '':
-                responselist.append(node)
-
-        return random.choice(responselist).Response
+                responselist.append(node.Response)
+        if len(responselist) == 0:
+            return "Not A Valid Input"
+        else:
+            print('breadth:' + str(breadthcount))
+            print('depth:' + str(depthcount))
+            return str("Response: " + random.choice(responselist) + "\n" +
+                       "DepthFirst Calls: " + str(depthcount) + "\n" +
+                       "BreadthFirst Calls: " + str(breadthcount))
