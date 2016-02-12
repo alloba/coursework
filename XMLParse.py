@@ -165,8 +165,6 @@ class XMLTree:
         if len(responselist) == 0:
             return "Not A Valid Input"
         else:
-            print('breadth:' + str(breadthcount))
-            print('depth:' + str(depthcount))
             return str("Response: " + random.choice(responselist) + "\n" +
                        "DepthFirst Calls: " + str(depthcount) + "\n" +
                        "BreadthFirst Calls: " + str(breadthcount))
