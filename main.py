@@ -20,6 +20,7 @@ def mainwindow_setup():
     window.configure(menu=menubar)
 
     window.bind('<Return>', submitinput)
+    window.bind('<Up>', previousinputentry)
 
 
 def treespace_setup():
@@ -39,7 +40,7 @@ def treespace_setup():
 
 
 def inputarea_setup():
-    global window, input_entry, outputarea_text
+    global window, input_entry, outputarea_text, previousinput
 
     input_entry = Entry(window)
     input_entry.place(relx=0.62, rely=0.91, relheight=0.08, relwidth=0.295)
@@ -51,14 +52,16 @@ def inputarea_setup():
     outputarea_text = tkinter.Text(window)
     outputarea_text.place(relx=0.62, rely=0.01, relheight=0.89, relwidth=0.375)
 
+    previousinput=""
 
 def submitinput(junk=0):
-    global input_entry, outputarea_text
+    global input_entry, outputarea_text, previousinput
     text = input_entry.get()
 
     if len(text) > 0:
         try:
             text = '>>> ' + input_entry.get() + '\n' + tree.getresponse(input_entry.get()) + '\n\n'
+            previousinput=input_entry.get()
             input_entry.delete(0, tkinter.END)
             outputarea_text.insert(tkinter.END, text)
         except NameError:
@@ -67,6 +70,12 @@ def submitinput(junk=0):
         outputarea_text.see(tkinter.END)
 
 
+def previousinputentry(junk=0):
+    global previousinput, input_entry
+    input_entry.delete(0, tkinter.END)
+    input_entry.insert(0,previousinput)
+
+    
 def openfile():
     global filename, tree, outputarea_text
     filename = tkinter.filedialog.askopenfilename(parent=window)
