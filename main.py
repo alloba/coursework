@@ -74,7 +74,7 @@ def submitinput(junk=0):
 def previousinputentry(junk=0):
     global previousinput, input_entry
     input_entry.delete(0, tkinter.END)
-    input_entry.insert(0,previousinput)
+    input_entry.insert(0, previousinput)
 
     
 def openfile():
@@ -84,7 +84,10 @@ def openfile():
         try:
             tree = XMLTree(filename)
             updatetree()
-        except () as e:
+            outputarea_text.insert(tkinter.END,
+                                   "Enter Behavior in the Space Below.\nPress the Up Arrow to Repeat Input.\n\n")
+        except (IndexError) as e:
+            outputarea_text.insert(tkinter.END, "Improperly formatted input file!")
             return
     else:
         outputarea_text.insert(tkinter.END, "Not a valid file" + '\n\n')
@@ -106,6 +109,6 @@ try:
     updatetree()
 except NameError:
     None
+outputarea_text.insert(tkinter.END, "Enter Behavior in the Space Below.\nPress the Up Arrow to Repeat Input.\n\n")
 
-outputarea_text.insert(tkinter.END, "Enter Behavior in the Space Below.\nPress the Up Arrow to Repeat Input.\n")
 window.mainloop()
