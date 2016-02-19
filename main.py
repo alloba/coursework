@@ -12,7 +12,7 @@ def mainwindow_setup():
 
     window = tkinter.Tk()
     window.title("Project 1")
-    window.geometry('700x400')
+    window.geometry('800x400')
     window.configure(background='medium spring green')
 
     menubar = tkinter.Menu(window)
@@ -53,6 +53,7 @@ def inputarea_setup():
     outputarea_text.place(relx=0.62, rely=0.01, relheight=0.89, relwidth=0.375)
 
     previousinput=""
+
 
 def submitinput(junk=0):
     global input_entry, outputarea_text, previousinput
@@ -106,4 +107,5 @@ try:
 except NameError:
     None
 
+outputarea_text.insert(tkinter.END, "Enter Behavior in the Space Below.\nPress the Up Arrow to Repeat Input.\n")
 window.mainloop()
