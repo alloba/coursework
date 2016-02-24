@@ -1,27 +1,27 @@
-body{
-    background: #3f3f3f;
-}
 
 .top-title {
     position: absolute;
-    left: 200px;
-    width:89%;
-    height:95px;
+    /*left: 200px;*/
+    width:100%;
+    height:10%;
     top:0;
 
     background: darkcyan;
     font-family: "Candal", sans-serif;
-    font-size: 40px;
+    font-size: 55px;
 }
 
 .menu-pane {
     position:absolute;
-    top: 0;
-    left:0;
+    top: 10%;
+    /*left:0;*/
     width: 200px;
-    height: 100%;
+    height: 90%;
+    /*padding:0px;*/
+    /*margin:0px;*/
     background: #202024;
     font-size: 30px;
+    font-family: "Candal", sans-serif;
 }
 
 .search-bar {
@@ -36,7 +36,6 @@ body{
     color: #202024;
 
 }
-
 .menu-pane ul{
     border-top: 1px solid #636366;
     list-style:none;
@@ -44,25 +43,24 @@ body{
     padding:0;
 
     font-size: 15px;
-    font-family: "Candal", sans-serif;
+
 }
 .menu-pane li{
     border-bottom:1px solid #636366;
     line-height: 45px;
     padding-left:10px;
 }
-
 .business-links{
     font-size: 13px;
 }
 
 
 .champ-information-pane{
-    position:absolute;
-    left:210px;
+    position:relative;
+    left:220px;
     top: 110px;
-    height:87%;
-    width:88%;
+    /*height:87%;*/
+    width:75%;
 
     background:greenyellow;
     font-family: Candal sans-serif;
@@ -93,4 +91,14 @@ a{
 
 a:hover{
     color: #77777a;
+}
+body{
+    background: #3f3f3f;
+    margin:0;
+}
+div{
+    margin:0;
+}
+p{
+    margin:0
 }
