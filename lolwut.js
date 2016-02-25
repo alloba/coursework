@@ -31,3 +31,15 @@ $(document).ready(function(){
 //$(document).ready(function(){
 //    $('.menu-pane').sideb
 //}
+
+$.getJSON("champion.json", function(data){
+    console.log(data[0]);
+    var items = [];
+    $.each(data, function(i, field){
+        items.push(field);
+    });
+    console.log(items[0]);
+});
+
+//var champ_json = JSON.parse("/champion.json")['data'];
+//document.getElementsByClassName("champ-information-pane").innerHTML=champ_json;
