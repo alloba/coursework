@@ -12,15 +12,15 @@
 
 </head>
 
+
 <body>
-<header class="top-title">
-    <p>Champion Select</p>
-</header>
+
+<header class="top-title"><p>Champion Select</p></header>
 
 <div class="menu-pane">
     <ul>
         <li><input class="search-bar" type="text"
-                   placeholder="searchhhhhhhhh" onkeydown="search(this)"></li>
+                   placeholder="search" onkeydown="search(this)"></li>
         <li><a href="">Assassins</a></li>
         <li><a href="">Fighters</a></li>
         <li><a href="">Mages</a></li>
@@ -38,180 +38,175 @@
 </div>
 
 
-
-
 <div class="champ-information-pane">
 
-    <div is="name">
-        <img src="http://www.computerhope.com/chguy.gif" alt="Name">
-        <div>
-            <input id="name" value="Name" readonly>
+    <img src="" alt="Name" class="champ-image">
+    <p class="name"> Name</p>
+
+    <div class="stats">
+        <div class="starting-stats">
+            <h1>Starting Stats </h1>
+            <table id="starting-stats-table">
+                <tr>
+                    <td>
+                        <p>Hp:</p>
+                    </td>
+                    <td>
+                        <p id="hp"></p>
+                    </td>
+                    <td>
+                        <p>Mana:</p>
+                    </td>
+
+                    <td>
+                        <p id="mp"></p>
+                    </td>
+                    <td>
+                        <p>Movement:</p>
+                    </td>
+                    <td>
+                        <p id="movespeed"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Armor: </p>
+                    </td>
+                    <td>
+                        <p id="armor">
+                    </td>
+                    <td>
+                        <p>Spell Block</p>
+                    </td>
+                    <td>
+                        <p id="spellblock"></p>
+                    </td>
+                    <td>
+                        <p> Attack Range: </p>
+                    </td>
+                    <td>
+                        <p id="attackrange"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Hp Regen: </p>
+                    </td>
+                    <td>
+                        <p id="hpregen"></p>
+
+                    </td>
+                    <td>
+                        <p> Mana Regen: </p>
+                    </td>
+                    <td>
+                        <p id="mpregen"></p>
+                    </td>
+                    <td>
+                        <p> Crit: </p>
+                    </td>
+                    <td>
+                        <p id="crit"></p>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <p>Attack Damage: </p>
+                    </td>
+                    <td>
+                        <p id="attackdamage"></p>
+
+                    </td>
+                    <td>
+                        <p> Attack Speed: </p>
+                    </td>
+                    <td>
+                        <p id="attackspeedoffset"></p>
+                    </td>
+                </tr>
+            </table>
         </div>
-    </div>
-    <div id="mainStats">
-        <h1>Starting Stats </h1>
-        <table id="mainStatsTable">
-            <tr>
-                <td>
-                    <label for="hp" class="hp"> Hp: </label>
-                </td>
-                <td>
-                    <input id="hp" readonly>
-                </td>
-                <td>
-                    <label for="mp">Mana:</label>
-                </td>
 
-                <td>
-                    <input id="mp" readonly>
-                </td>
-                <td>
-                    <label for="movespeed">Movement</label>
-                </td>
-                <td>
-                    <input id="movespeed" readonly>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="armor">Armor: </label>
-                </td>
-                <td>
-                    <input id="armor" readonly>
-                </td>
-                <td>
-                    <label for="spellblock"> <span class="secondColumn">Spell Block:</span> </label>
-                </td>
-                <td>
-                    <input id="spellblock" readonly>
-                </td>
-                <td>
-                    <label for="attackrange"> Attack Range: </label>
-                </td>
-                <td>
-                    <input id="attackrange" readonly>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="hpregen">Hp Regen: </label>
-                </td>
-                <td>
-                    <input id="hpregen" readonly>
-
-                </td>
-                <td>
-                    <label for="mpregen"> Mana Regen: </label>
-                </td>
-                <td>
-                    <input id="mpregen" readonly>
-
-                </td>
-                <td>
-                    <label for="crit"> Crit: </label>
-                </td>
-                <td>
-                    <input id="crit" readonly>
-
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="attackdamage">Attack Damage: </label>
-                </td>
-                <td>
-                    <input id="attackdamage" readonly>
-
-                </td>
-                <td>
-                    <label for="attackspeedoffset"> Attack Speed: </label>
-                </td>
-                <td>
-                    <input id="attackspeedoffset" readonly>
-
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div id="perLevelStats">
+        <div class="per-level-stats">
         <h1> Stats per level</h1>
         <table id="perLevelStatsForm">
 
             <tr>
                 <td>
-                    <label for="hpperlevel"> Hp: </label>
+                    <p> Hp: </p>
                 </td>
                 <td>
-                    <input id="hpperlevel" readonly>
+                    <p id="hpperlevel"></p>
                 </td>
                 <td>
-                    <label for="mpperlevel"> Mana: </label>
+                    <p> Mana: </p>
                 </td>
 
                 <td>
-                    <input id="mpperlevel" readonly>
+                    <p id="mpperlevel"></p>
                 </td>
                 <td>
-                    <label for="armorperlevel"> Armor: </label>
+                    <p> Armor: </p>
                 </td>
                 <td>
-                    <input id="armorperlevel" readonly>
+                    <p id="armorperlevel"></p>
                 </td>
 
             </tr>
             <tr>
                 <td>
-                    <label for="spellblockperlevel"> Spellblock: </label>
+                    <p> Spellblock: </p>
                 </td>
                 <td>
-                    <input id="spellblockperlevel" readonly>
+                    <p id="spellblockperlevel"></p>
                 </td>
                 <td>
-                    <label for="hpregenperlevel"> Hp Regen: </label>
+                    <p> Hp Regen: </p>
                 </td>
                 <td>
-                    <input id="hpregenperlevel" readonly>
+                    <p id="hpregenperlevel"></p>
                 </td>
                 <td>
-                    <label for="mpregenperlevel"> Mana Regen: </label>
+                    <p> Mana Regen: </p>
                 </td>
                 <td>
-                    <input id="mpregenperlevel" readonly>
+                    <p id="mpregenperlevel"></p>
                 </td>
             </tr>
-
 
             <tr>
 
                 <td>
-                    <label for="critperlevel"> Crit: </label>
+                    <p> Crit: </p>
                 </td>
                 <td>
-                    <input id="critperlevel" readonly>
+                    <p id="critperlevel"></p>
                 </td>
                 <td>
-                    <label for="attackdamageperlevel"> Attack Damage: </label>
+                    <p> Attack Damage: </p>
                 </td>
                 <td>
-                    <input id="attackdamageperlevel" readonly>
+                    <p id="attackdamageperlevel"></p>
                 </td>
                 <td>
-                    <label for="attackspeedperlevel"> Attack Speed: </label>
+                    <p> Attack Speed: </p>
                 </td>
                 <td>
-                    <input id="attackspeedperlevel" readonly>
+                    <p id="attackspeedperlevel"></p>
                 </td>
             </tr>
 
         </table>
     </div>
+    </div>
+
 </div>
-<div id="championList"> </div>
+
+<div class="champ-list">
+    <p>list area</p>
+</div>
 
 
 </body>
-
 </html>
-Status API Training Shop Blog About Pricing
-© 2016 GitHub, Inc. Terms Privacy Security Contact

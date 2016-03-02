@@ -1,4 +1,4 @@
-.top-title {
+.top-title p{
     position: absolute;
     /*left: 200px;*/
     width:100%;
@@ -7,17 +7,14 @@
 
     background: darkcyan;
     font-family: "Candal", sans-serif;
-    font-size: 55px;
+    font-size: 50px;
 }
 
 .menu-pane {
     position:absolute;
     top: 10%;
-    /*left:0;*/
     width: 200px;
     height: 90%;
-    /*padding:0px;*/
-    /*margin:0px;*/
     background: #202024;
     font-size: 30px;
     font-family: "Candal", sans-serif;
@@ -58,29 +55,61 @@
     position:relative;
     left:220px;
     top: 110px;
-    /*height:87%;*/
-    width:75%;
+    width:50%;
+    margin-bottom: -100px;
+    display:none;
 
     background:greenyellow;
     font-family: Candal sans-serif;
     font-size: 10px;
 }
 
-
-.search-bar::-webkit-input-placeholder {
-    color: #1e1e23;
+.champ-image{
+    display: inline-block;
+    width: 300px;
+    padding: 5px;
 }
 
-.search-bar:-moz-placeholder { /* Firefox 18- */
-    color: #1e1e23;
+.name{
+    position: absolute;
+    left: 320px;
+    top: 10px;
+}
+.stats{
+   position: absolute;
+    left:320px;
+    top:40px;
 }
 
-.search-bar::-moz-placeholder {  /* Firefox 19+ */
-    color: #1e1e23;
+td{
+    padding-right: 15px;
 }
 
-.search-bar:-ms-input-placeholder {
-    color: #1e1e23;
+.champ-list{
+    position: absolute;
+    left:220px;
+    top: 110px;
+    display:none;
+}
+
+
+p{
+    font-size: 20px;
+    font-weight: bold;
+    margin:0
+}
+
+#name{
+    background-color: greenyellow;
+    border: none;
+    font-weight: bold;
+    font-size: 15px;
+    color: red;
+}
+
+input{
+    border:none;
+    background-color: white;
 }
 
 a{
@@ -98,33 +127,19 @@ body{
 div{
     margin:0;
 }
-p{
-    font-size: 20px;
-    font-weight: bold;
-    margin:0
-}
-label{
-    font-size: 20px;
-}
-textarea{
-    width:200px;
-    height: 100px;
-    background-color: green;
 
-}
-#name{
-    background-color: greenyellow;
-    border: none;
-    font-weight: bold;
-    font-size: 15px;
-    color: red;
-}
-input{
-    border:none;
-    background-color: greenyellow;
+.search-bar::-webkit-input-placeholder {
+    color: #1e1e23;
 }
 
-#championList{
-    visibility: hidden;
+.search-bar:-moz-placeholder { /* Firefox 18- */
+    color: #1e1e23;
 }
 
+.search-bar::-moz-placeholder {  /* Firefox 19+ */
+    color: #1e1e23;
+}
+
+.search-bar:-ms-input-placeholder {
+    color: #1e1e23;
+}
