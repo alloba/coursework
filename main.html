@@ -1,47 +1,217 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-        <link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
 
-        <link href="style.css" type="text/css" rel="stylesheet">
+    <link href="style.css" type="text/css" rel="stylesheet">
 
-        <script src="lolwut.js" type="text/javascript"></script>
+    <script src="lolwut.js" type="text/javascript"></script>
 
-        <title>Web project</title>
+    <title>Web project</title>
 
-    </head>
+</head>
 
-    <body>
-        <header class="top-title">
-            <p>Champion Select</p>
-        </header>
+<body>
+<header class="top-title">
+    <p>Champion Select</p>
+</header>
 
-        <div class="menu-pane">
-            <ul>
-                <li><input class="search-bar" type="text"
-                           placeholder="search" onkeydown="search(this)"></li>
-                <li><a href="">Assassins</a></li>
-                <li><a href="">Fighters</a></li>
-                <li><a href="">Mages</a></li>
-                <li><a href="">Marksmen</a></li>
-                <li><a href="">Support</a></li>
-                <li><a href="">Tank</a></li>
+<div class="menu-pane">
+    <ul>
+        <li><input class="search-bar" type="text"
+                   placeholder="search" onkeydown="search(this)"></li>
+        <li><a href="">Assassins</a></li>
+        <li><a href="">Fighters</a></li>
+        <li><a href="">Mages</a></li>
+        <li><a href="">Marksmen</a></li>
+        <li><a href="">Support</a></li>
+        <li><a href="">Tank</a></li>
 
-            </ul>
+    </ul>
 
-            <ul class="business-links">
-                <li><a href="">About Us</a></li>
-                <li><a href="">League of Legends</a></li>
-            </ul>
+    <ul class="business-links">
+        <li><a href="">About Us</a></li>
+        <li><a href="">League of Legends</a></li>
+    </ul>
 
+</div>
+
+
+
+
+<div class="champ-information-pane">
+
+    <div is="name">
+        <img src="http://www.computerhope.com/chguy.gif" alt="Name">
+        <div>
+            <input id="name" value="Name" readonly>
         </div>
+    </div>
+    <div id="mainStats">
+        <h1>Starting Stats </h1>
+        <table id="mainStatsTable">
+            <tr>
+                <td>
+                    <label for="hp" class="hp"> Hp: </label>
+                </td>
+                <td>
+                    <input id="hp" readonly>
+                </td>
+                <td>
+                    <label for="mp">Mana:</label>
+                </td>
 
-        <section class="champ-information-pane">
-            <p>display area</p>
-        </section>
+                <td>
+                    <input id="mp" readonly>
+                </td>
+                <td>
+                    <label for="movespeed">Movement</label>
+                </td>
+                <td>
+                    <input id="movespeed" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="armor">Armor: </label>
+                </td>
+                <td>
+                    <input id="armor" readonly>
+                </td>
+                <td>
+                    <label for="spellblock"> <span class="secondColumn">Spell Block:</span> </label>
+                </td>
+                <td>
+                    <input id="spellblock" readonly>
+                </td>
+                <td>
+                    <label for="attackrange"> Attack Range: </label>
+                </td>
+                <td>
+                    <input id="attackrange" readonly>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="hpregen">Hp Regen: </label>
+                </td>
+                <td>
+                    <input id="hpregen" readonly>
+
+                </td>
+                <td>
+                    <label for="mpregen"> Mana Regen: </label>
+                </td>
+                <td>
+                    <input id="mpregen" readonly>
+
+                </td>
+                <td>
+                    <label for="crit"> Crit: </label>
+                </td>
+                <td>
+                    <input id="crit" readonly>
+
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="attackdamage">Attack Damage: </label>
+                </td>
+                <td>
+                    <input id="attackdamage" readonly>
+
+                </td>
+                <td>
+                    <label for="attackspeedoffset"> Attack Speed: </label>
+                </td>
+                <td>
+                    <input id="attackspeedoffset" readonly>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="perLevelStats">
+        <h1> Stats per level</h1>
+        <table id="perLevelStatsForm">
+
+            <tr>
+                <td>
+                    <label for="hpperlevel"> Hp: </label>
+                </td>
+                <td>
+                    <input id="hpperlevel" readonly>
+                </td>
+                <td>
+                    <label for="mpperlevel"> Mana: </label>
+                </td>
+
+                <td>
+                    <input id="mpperlevel" readonly>
+                </td>
+                <td>
+                    <label for="armorperlevel"> Armor: </label>
+                </td>
+                <td>
+                    <input id="armorperlevel" readonly>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <label for="spellblockperlevel"> Spellblock: </label>
+                </td>
+                <td>
+                    <input id="spellblockperlevel" readonly>
+                </td>
+                <td>
+                    <label for="hpregenperlevel"> Hp Regen: </label>
+                </td>
+                <td>
+                    <input id="hpregenperlevel" readonly>
+                </td>
+                <td>
+                    <label for="mpregenperlevel"> Mana Regen: </label>
+                </td>
+                <td>
+                    <input id="mpregenperlevel" readonly>
+                </td>
+            </tr>
 
 
-    </body>
+            <tr>
+
+                <td>
+                    <label for="critperlevel"> Crit: </label>
+                </td>
+                <td>
+                    <input id="critperlevel" readonly>
+                </td>
+                <td>
+                    <label for="attackdamageperlevel"> Attack Damage: </label>
+                </td>
+                <td>
+                    <input id="attackdamageperlevel" readonly>
+                </td>
+                <td>
+                    <label for="attackspeedperlevel"> Attack Speed: </label>
+                </td>
+                <td>
+                    <input id="attackspeedperlevel" readonly>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+</div>
+<div id="championList"> </div>
+
+
+</body>
 
 </html>
+Status API Training Shop Blog About Pricing
+© 2016 GitHub, Inc. Terms Privacy Security Contact
