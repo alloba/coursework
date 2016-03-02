@@ -55,7 +55,8 @@
     position:relative;
     left:220px;
     top: 110px;
-    width:50%;
+    width:80%;
+    max-width: 1000px;
     margin-bottom: -100px;
     display:none;
 
