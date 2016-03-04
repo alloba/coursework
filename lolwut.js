@@ -3,17 +3,10 @@
  */
 
 $(document).ready(function(){
-
+    var champComparePane = $('.champComparePane');
+    champComparePane.html($('.champInfoPane').html());
+    champComparePane.css({'position':'absolute', 'top':'110px', 'left':'58%', 'width':'40%'});
 });
-
-function findchampkey(name){
-    $.getJSON('champion.json', function(response){
-        //console.log(Object.keys(response.data));
-        console.log = response.data[name].key;
-    });
-
-
-}
 
 function getChamp(name){
     var val;
@@ -25,17 +18,14 @@ function getChamp(name){
     return val;
 }
 
-function search(ele){
+function search_from_menu(ele){
     if(event.keyCode == 13){
         var givenID = ele.value.charAt(0).toUpperCase() + ele.value.slice(1);
         try {
-
             console.log(getChamp(givenID).id);
-            $('.champ-information-pane').fadeOut(400, function(){
-                $(':hidden').show(1000);
-                gatherInfo(givenID);
-                $('.champ-information-pane').fadeIn(400, function(){});
-
+            $('.champInfoPane').fadeOut(400, function(){
+                $('.champInfoPane').show(1000);
+                gatherInfo(givenID, 'champInfoPane');
             });
         }
         catch (e){
@@ -43,54 +33,50 @@ function search(ele){
         }
     }
 }
-function gatherInfo(val){
-    $('.champ-information-pane .name').text(getChamp(val).id);
-    $('.champ-image').attr('src', 'Champion_Images/' + val + '.jpg');
-    /*
-    STARTING class .starting-stats
-    hp id           hp
-    armor id        armor
-    hpregen         hpregen
-    attackdamage    attackdamage
-    mana            mp
-    spell block     spellblock
-    manaregen       mpregen
-    attackspd       attackspeedoffset
-    movement        movespeed
-    attkrange       attackrange
-    crit            crit
 
-    PERLEVEL
-    hp              hpperlevel
-    spellblock      spellblockperlevel
-    crit            critperlevel
-    mana            mpperlevel
-    hpregen         hpregenperlevel
-    attkdmg         attackdamageperlevel
-    armor           armorperlevel
-    manaregen       mpregenperlevel
-    attkspd         attackspeedperlevel
-     */
-    $('#hp').text(getChamp(val).stats.hp);
-    $('#armor').text(getChamp(val).stats.armor);
-    $('#hpregen').text(getChamp(val).stats.hpregen);
-    $('#attackdamage').text(getChamp(val).stats.attackdamage);
-    $('#mp').text(getChamp(val).stats.mp);
-    $('#spellblock').text(getChamp(val).stats.spellblock);
-    $('#mpregen').text(getChamp(val).stats.mpregen);
-    $('#attackspeedoffset').text(getChamp(val).stats.attackspeedoffset);
-    $('#movespeed').text(getChamp(val).stats.movespeed);
-    $('#attackrange').text(getChamp(val).stats.attackrange);
-    $('#crit').text(getChamp(val).stats.crit);
+function search_from_champ_pane(ele){
+    if(event.keyCode == 13) {
+        var givenID = ele.value.charAt(0).toUpperCase() + ele.value.slice(1);
+        try{
+            console.log(getChamp(givenID).id);
+            $('.champComparePane').fadeOut(400, function(){
+                $('.champComparePane').show(1000);
+                $('.champComparePane .search-bar-champ-pane').hide();
+                gatherInfo(givenID, 'champComparePane');
 
-    $('#hpperleve').text(getChamp(val).stats.hpperlevel);
-    $('#spellblockperlevel').text(getChamp(val).stats.spellblockperlevel);
-    $('#critperlevel').text(getChamp(val).stats.critperlevel);
-    $('#mpperlevel').text(getChamp(val).stats.mpperlevel);
-    $('#hpregenperlevel').text(getChamp(val).stats.hpregenperlevel);
-    $('#attackdamageperlevel').text(getChamp(val).stats.attackdamageperlevel);
-    $('#armorperlevel').text(getChamp(val).stats.armorperlevel);
-    $('#mpregenperlevel').text(getChamp(val).stats.mpregenperlevel);
-    $('#attackspeedperlevel').text(getChamp(val).stats.attackspeedperlevel);
+            });
+        }
+        catch(e){
+            console.log("champ name not found");
+        }
+    }
+}
+
+function gatherInfo(val, pane_name){
+    var display_element = $('.'+pane_name);
+
+    display_element.find('.name').text(getChamp(val).id);
+    display_element.find('.champ-image').attr('src', 'Champion_Images/' + val + '.jpg');
+    display_element.find('#hp').text(getChamp(val).stats.hp);
+    display_element.find('#armor').text(getChamp(val).stats.armor);
+    display_element.find('#hpregen').text(getChamp(val).stats.hpregen);
+    display_element.find('#attackdamage').text(getChamp(val).stats.attackdamage);
+    display_element.find('#mp').text(getChamp(val).stats.mp);
+    display_element.find('#spellblock').text(getChamp(val).stats.spellblock);
+    display_element.find('#mpregen').text(getChamp(val).stats.mpregen);
+    display_element.find('#attackspeedoffset').text(getChamp(val).stats.attackspeedoffset);
+    display_element.find('#movespeed').text(getChamp(val).stats.movespeed);
+    display_element.find('#attackrange').text(getChamp(val).stats.attackrange);
+    display_element.find('#crit').text(getChamp(val).stats.crit);
+
+    display_element.find('#hpperlevel').text(getChamp(val).stats.hpperlevel);
+    display_element.find('#spellblockperlevel').text(getChamp(val).stats.spellblockperlevel);
+    display_element.find('#critperlevel').text(getChamp(val).stats.critperlevel);
+    display_element.find('#mpperlevel').text(getChamp(val).stats.mpperlevel);
+    display_element.find('#hpregenperlevel').text(getChamp(val).stats.hpregenperlevel);
+    display_element.find('#attackdamageperlevel').text(getChamp(val).stats.attackdamageperlevel);
+    display_element.find('#armorperlevel').text(getChamp(val).stats.armorperlevel);
+    display_element.find('#mpregenperlevel').text(getChamp(val).stats.mpregenperlevel);
+    display_element.find('#attackspeedperlevel').text(getChamp(val).stats.attackspeedperlevel);
 
 }

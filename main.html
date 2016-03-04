@@ -20,7 +20,7 @@
 <div class="menu-pane">
     <ul>
         <li><input class="search-bar" type="text"
-                   placeholder="search" onkeydown="search(this)"></li>
+                   placeholder="search" onkeydown="search_from_menu(this)"></li>
         <li><a href="">Assassins</a></li>
         <li><a href="">Fighters</a></li>
         <li><a href="">Mages</a></li>
@@ -37,8 +37,7 @@
 
 </div>
 
-
-<div class="champ-information-pane">
+<div class="champInfoPane">
 
     <img src="" alt="Name" class="champ-image">
     <p class="name"> Name</p>
@@ -48,79 +47,79 @@
             <h1>Starting Stats </h1>
             <table id="starting-stats-table">
                 <tr>
-                    <td>
+                    <th>
                         <p>Hp:</p>
-                    </td>
+                    </th>
                     <td>
                         <p id="hp"></p>
                     </td>
-                    <td>
+                    <th>
                         <p>Mana:</p>
-                    </td>
+                    </th>
 
                     <td>
                         <p id="mp"></p>
                     </td>
-                    <td>
+                    <th>
                         <p>Movement:</p>
-                    </td>
+                    </th>
                     <td>
                         <p id="movespeed"></p>
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <th>
                         <p>Armor: </p>
-                    </td>
+                    </th>
                     <td>
                         <p id="armor">
                     </td>
-                    <td>
+                    <th>
                         <p>Spell Block</p>
-                    </td>
+                    </th>
                     <td>
                         <p id="spellblock"></p>
                     </td>
-                    <td>
+                    <th>
                         <p> Attack Range: </p>
-                    </td>
+                    </th>
                     <td>
                         <p id="attackrange"></p>
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <th>
                         <p>Hp Regen: </p>
-                    </td>
+                    </th>
                     <td>
                         <p id="hpregen"></p>
 
                     </td>
-                    <td>
+                    <th>
                         <p> Mana Regen: </p>
-                    </td>
+                    </th>
                     <td>
                         <p id="mpregen"></p>
                     </td>
-                    <td>
+                    <th>
                         <p> Crit: </p>
-                    </td>
+                    </th>
                     <td>
                         <p id="crit"></p>
 
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <th>
                         <p>Attack Damage: </p>
-                    </td>
+                    </th>
                     <td>
                         <p id="attackdamage"></p>
 
                     </td>
-                    <td>
+                    <th>
                         <p> Attack Speed: </p>
-                    </td>
+                    </th>
                     <td>
                         <p id="attackspeedoffset"></p>
                     </td>
@@ -133,43 +132,43 @@
         <table id="perLevelStatsForm">
 
             <tr>
-                <td>
+                <th>
                     <p> Hp: </p>
-                </td>
+                </th>
                 <td>
                     <p id="hpperlevel"></p>
                 </td>
-                <td>
+                <th>
                     <p> Mana: </p>
-                </td>
+                </th>
 
                 <td>
                     <p id="mpperlevel"></p>
                 </td>
-                <td>
+                <th>
                     <p> Armor: </p>
-                </td>
+                </th>
                 <td>
                     <p id="armorperlevel"></p>
                 </td>
 
             </tr>
             <tr>
-                <td>
+                <th>
                     <p> Spellblock: </p>
-                </td>
+                </th>
                 <td>
                     <p id="spellblockperlevel"></p>
                 </td>
-                <td>
+                <th>
                     <p> Hp Regen: </p>
-                </td>
+                </th>
                 <td>
                     <p id="hpregenperlevel"></p>
                 </td>
-                <td>
+                <th>
                     <p> Mana Regen: </p>
-                </td>
+                </th>
                 <td>
                     <p id="mpregenperlevel"></p>
                 </td>
@@ -177,21 +176,21 @@
 
             <tr>
 
-                <td>
+                <th>
                     <p> Crit: </p>
-                </td>
+                </th>
                 <td>
                     <p id="critperlevel"></p>
                 </td>
-                <td>
+                <th>
                     <p> Attack Damage: </p>
-                </td>
+                </th>
                 <td>
                     <p id="attackdamageperlevel"></p>
                 </td>
-                <td>
+                <th>
                     <p> Attack Speed: </p>
-                </td>
+                </th>
                 <td>
                     <p id="attackspeedperlevel"></p>
                 </td>
@@ -199,9 +198,18 @@
 
         </table>
     </div>
+
     </div>
 
+    <input class="search-bar-champ-pane" type="text"
+               placeholder="Compare Another Champ" onkeydown="search_from_champ_pane(this)">
 </div>
+
+
+<div class="champComparePane" style="position:absolute; top:12%; left:60%; display:none">
+asdasdsddfas
+</div>
+
 
 <div class="champ-list">
     <p>list area</p>
