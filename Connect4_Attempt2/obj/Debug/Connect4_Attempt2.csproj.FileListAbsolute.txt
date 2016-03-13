@@ -1,0 +1,6 @@
+C:\CourseWork\AI\Project 2\Connect4_Attempt2\Connect4_Attempt2\bin\Debug\Connect4_Attempt2.exe.config
+C:\CourseWork\AI\Project 2\Connect4_Attempt2\Connect4_Attempt2\obj\Debug\Connect4_Attempt2.csprojResolveAssemblyReference.cache
+C:\CourseWork\AI\Project 2\Connect4_Attempt2\Connect4_Attempt2\bin\Debug\Connect4_Attempt2.exe
+C:\CourseWork\AI\Project 2\Connect4_Attempt2\Connect4_Attempt2\bin\Debug\Connect4_Attempt2.pdb
+C:\CourseWork\AI\Project 2\Connect4_Attempt2\Connect4_Attempt2\obj\Debug\Connect4_Attempt2.exe
+C:\CourseWork\AI\Project 2\Connect4_Attempt2\Connect4_Attempt2\obj\Debug\Connect4_Attempt2.pdb
