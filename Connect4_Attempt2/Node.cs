@@ -5,6 +5,7 @@ namespace Connect4_Attempt2
     internal class Node
     {
         public int[,] board;
+        public double score;
         public List<Node> children;
 
         public Node(int[,] given_board)

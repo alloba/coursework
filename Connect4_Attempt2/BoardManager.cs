@@ -4,9 +4,9 @@ namespace Connect4_Attempt2
 {
     internal class BoardManager
     {
-        private int height;
-        private int width;
-        private int win_condition;
+        public int height;
+        public int width;
+        public int win_condition;
 
         public BoardManager(int width, int height, int win_condition)
         {
@@ -37,22 +37,28 @@ namespace Connect4_Attempt2
 
         internal int[,] PlayMove(int move, int player, int[,] board)
         {
+            int[,] new_board = new int[board.GetLength(0),board.GetLength(1)];
+            for(int y = 0; y < board.GetLength(0); y++)//copy board to new board. since copy by reference is no bueno.ll
+            { for (int x = 0; x < board.GetLength(1); x++)
+                { new_board[y, x] = board[y, x]; }
+            } 
+
             move = move - 1;
             if (board[0, move] != 0)
             {
-                return board; //edge case where column full
+                return new_board; //edge case where column full
             }
 
             for (int i = 1; i < height; i++)
             {
                 if (board[i, move] != 0)
                 {
-                    board[i - 1, move] = player;
-                    return board;
+                    new_board[i - 1, move] = player;
+                    return new_board;
                 }
             }
-            board[height - 1, move] = player; // if no pieces are in the column
-            return board;
+            new_board[height - 1, move] = player; // if no pieces are in the column
+            return new_board;
         }
 
         internal bool CheckWin(int[,] board, int most_recent_move)
