@@ -68,7 +68,7 @@ namespace Connect4_Attempt2
 
                     //tree.Generate_Branches(2, current_turn);
                     //Display_Board(tree.root.board);
-                    most_recent_move = Evaluator.MiniMax(boardmanager, tree, current_turn, 10); //definitely dont go above 10 levels or so.
+                    most_recent_move = Evaluator.MiniMax(boardmanager, tree, current_turn, 5); //definitely dont go above 10 levels or so.
 
                     //Create Trees
                     //Evaluate through minimax

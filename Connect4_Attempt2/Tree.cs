@@ -30,7 +30,7 @@ namespace Connect4_Attempt2
         void Generate_Branches_Recurse(Node n, int player_move, int max_depth, int current_depth)
         {
             if (current_depth >= max_depth) return;
-            for (int i = 1; i < boardmanager.width+1; i++)
+            for (int i = 1; i <= boardmanager.width; i++)
             {
                 if (boardmanager.TestMove(i, n.board))
                 {

@@ -133,5 +133,30 @@ namespace Connect4_Attempt2
             }
             return false;
         }
+
+        public void Display_Board(int[,] board)
+        { //hopefully this gets replaced eventuall by a gui. we'll see.
+            string output = "";
+
+            int height = board.GetLength(0);
+            int width = board.GetLength(1);
+
+            output += new string('═', width * 2) + "\n";
+
+            for (int row = 0; row < height; row++)
+            {
+                output += "|";
+                for (int col = 0; col < width; col++)
+                {
+                    output += board[row, col].ToString() + " ";
+                }
+                output += "|\n";
+            }
+            output += new string('═', width * 2) + "\n";
+
+            output = output.Replace('1', 'r').Replace('2', 'b');
+
+            Console.WriteLine(output);
+        }
     }
 }

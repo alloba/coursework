@@ -68,20 +68,19 @@ namespace Connect4_Attempt2
 
         public static int MiniMax(BoardManager boardmanager, Tree t, int player, int max_depth)
         {
-            int score = 0;
-            Node max_node = new Node(boardmanager.Create_Blank_Board());
-
             t.Generate_Branches(max_depth, player);
 
             Node n = t.root;
+            Node max_node = n.children[0];
 
             foreach (Node child in n.children)
             {
-                if(Min_Value(boardmanager, child, player, max_depth, 0) > score)
+                if (Min_Value(boardmanager, child, player, max_depth, 1) > Board_Score(boardmanager, max_node.board, player))
                 {
                     max_node = child;
                 }
             }
+            
             return max_node.move_made;
             
 
@@ -96,7 +95,7 @@ namespace Connect4_Attempt2
             foreach(Node child in node.children)
             {
                 int min_val = Maximum_Value(boardmanager, child, player, max_depth, current_depth + 1);
-                if (min_val > value) value = min_val;
+                if (min_val < value) value = min_val;
             }
             return value;
         }
@@ -110,7 +109,7 @@ namespace Connect4_Attempt2
             foreach(Node child in node.children)
             {
                 int max_val = Min_Value(boardmanager, child, player, max_depth, current_depth + 1);
-                if (max_val < value) value = max_val;
+                if (max_val > value) value = max_val;
             }
             return value;
         }
