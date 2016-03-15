@@ -8,9 +8,11 @@ namespace Connect4_Attempt2
 {
     class Evaluator
     {
-        public static double Board_Score(BoardManager boardmanager, int[,] board, int player_piece, bool ismyturn)
+        public static int Board_Score(BoardManager boardmanager, int[,] board, int player_piece)
         {
-            double score = 0;
+            //the scoring for the board right now isnt good enough to get results, honestly.
+            //a good first step would be to check if the remaining blank space is enough to win with. otherwise its no good
+            int score = 0;
             for (int y = 0; y < boardmanager.height; y++)
             {
                 for (int x = 0; x < boardmanager.width; x++)
@@ -34,12 +36,12 @@ namespace Connect4_Attempt2
             return score;
         }
 
-        private static double Recurse_Score(int row_pos, int col_pos, int y_dir, int x_dir, int[,] board, int piece)
+        private static int Recurse_Score(int row_pos, int col_pos, int y_dir, int x_dir, int[,] board, int piece)
         {
             // checks recursively values along a certain path, starting at the given position and incrementing the given amount x and y.
             //currently the only thing it does is check the next cell on the path and increase the score by 1 if it likes what it sees.
 
-            double score = 0;
+            int score = 0;
 
             if (row_pos + y_dir > board.GetLength(0) - 1 || col_pos + x_dir > board.GetLength(1) - 1) return 0; //if the next thing to be checking is out of bounds, return
             if (row_pos + y_dir < 0 || col_pos + x_dir < 0) return 0; //out of bounds in the other direction.
@@ -64,6 +66,54 @@ namespace Connect4_Attempt2
             return Recurse_Score(row_pos + y_dir, col_pos + x_dir, y_dir, x_dir, board, piece);
         }
 
+        public static int MiniMax(BoardManager boardmanager, Tree t, int player, int max_depth)
+        {
+            int score = 0;
+            Node max_node = new Node(boardmanager.Create_Blank_Board());
+
+            t.Generate_Branches(max_depth, player);
+
+            Node n = t.root;
+
+            foreach (Node child in n.children)
+            {
+                if(Min_Value(boardmanager, child, player, max_depth, 0) > score)
+                {
+                    max_node = child;
+                }
+            }
+            return max_node.move_made;
+            
+
+        }
+
+        private static int Min_Value(BoardManager boardmanager, Node node, int player, int max_depth, int current_depth)
+        {
+            if (node.children.Count() == 0) return Board_Score(boardmanager, node.board, player);
+            if (current_depth >= max_depth) return Board_Score(boardmanager, node.board, player);
+
+            int value = 10000;
+            foreach(Node child in node.children)
+            {
+                int min_val = Maximum_Value(boardmanager, child, player, max_depth, current_depth + 1);
+                if (min_val > value) value = min_val;
+            }
+            return value;
+        }
+
+        private static int Maximum_Value(BoardManager boardmanager, Node node, int player, int max_depth, int current_depth)
+        {
+            if (node.children.Count() == 0) return Board_Score(boardmanager, node.board, player);
+            if (current_depth >= max_depth) return Board_Score(boardmanager, node.board, player);
+
+            int value = -1000;
+            foreach(Node child in node.children)
+            {
+                int max_val = Min_Value(boardmanager, child, player, max_depth, current_depth + 1);
+                if (max_val < value) value = max_val;
+            }
+            return value;
+        }
     }
 }
 

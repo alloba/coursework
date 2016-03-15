@@ -68,14 +68,14 @@ namespace Connect4_Attempt2
 
                     //tree.Generate_Branches(2, current_turn);
                     //Display_Board(tree.root.board);
-                    Console.WriteLine(Evaluator.Board_Score(boardmanager, tree.root.board, current_turn, true));
+                    most_recent_move = Evaluator.MiniMax(boardmanager, tree, current_turn, 10); //definitely dont go above 10 levels or so.
 
                     //Create Trees
                     //Evaluate through minimax
                     //recommend a move
                 }
 
-                tree.root = new Node(boardmanager.PlayMove(most_recent_move, current_turn, tree.root.board)); //the root is no longer needed, reassign to the new board.
+                tree.root = new Node(boardmanager.PlayMove(most_recent_move, current_turn, tree.root.board)); //the root needs to be updated
                 Display_Board(tree.root.board);
                 
                 if (boardmanager.CheckWin(tree.root.board, most_recent_move))

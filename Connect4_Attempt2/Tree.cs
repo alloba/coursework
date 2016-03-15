@@ -34,7 +34,7 @@ namespace Connect4_Attempt2
             {
                 if (boardmanager.TestMove(i, n.board))
                 {
-                    n.Add_Child(new Node(boardmanager.PlayMove(i, player_move, n.board)));
+                    n.Add_Child(new Node(boardmanager.PlayMove(i, player_move, n.board), i));
                 }
             }
 
