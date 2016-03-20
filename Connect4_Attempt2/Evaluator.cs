@@ -10,60 +10,111 @@ namespace Connect4_Attempt2
     {
         public static int Board_Score(BoardManager boardmanager, int[,] board, int player_piece)
         {
-            //the scoring for the board right now isnt good enough to get results, honestly.
-            //a good first step would be to check if the remaining blank space is enough to win with. otherwise its no good
             int score = 0;
-            for (int y = 0; y < boardmanager.height; y++)
+
+            for (int i = 0; i < boardmanager.width; i++)
             {
-                for (int x = 0; x < boardmanager.width; x++)
+                int row_pos = 0;
+
+                int board_height = board.GetLength(0);
+                int board_width = board.GetLength(1);
+
+                //find the first non-empty space in the column
+                while (board[row_pos, i] == 0 && row_pos < board_height-1) row_pos += 1;
+                //if the entire thing is empty, score for that row is 0
+                if (board[row_pos, i] == 0) return 0;
+
+                //otherwise, actually calculate the score
+                else
                 {
-                    //n^2 sucks, but at least this way it doesnt do any operations if the location is empty. I cant think of a way to get out of it, anyhow
-                    if (board[y, x] != 0)
-                    {
-                        score += Recurse_Score(y, x, -1, 0, board, player_piece); //check up
-                        score += Recurse_Score(y, x, 1, 0, board, player_piece); //check down
-
-                        score += Recurse_Score(y, x, 0, 1, board, player_piece); //right
-                        score += Recurse_Score(y, x, 0, -1, board, player_piece); //left
-
-                        score += Recurse_Score(y, x, -1, -1, board, player_piece); //up and left
-                        score += Recurse_Score(y, x, -1, 1, board, player_piece); //up and right
-                        score += Recurse_Score(y, x, 1, -1, board, player_piece); //down and left
-                        score += Recurse_Score(y, x, 1, 1, board, player_piece); //down and right
-                    }
+                    score += Recurse_Score(row_pos, i, -1, 0, board, player_piece, boardmanager.win_condition); //down
+                    score += Recurse_Score(row_pos, i, 1, 0, board, player_piece, boardmanager.win_condition); //down
+                    score += Recurse_Score(row_pos, i, 0, -1, board, player_piece, boardmanager.win_condition); //left
+                    score += Recurse_Score(row_pos, i, 0, 1, board, player_piece, boardmanager.win_condition); //right
+                    score += Recurse_Score(row_pos, i, -1, -1, board, player_piece, boardmanager.win_condition); //up and left
+                    score += Recurse_Score(row_pos, i, -1, 1, board, player_piece, boardmanager.win_condition); //up and right
+                    score += Recurse_Score(row_pos, i, 1, -1, board, player_piece, boardmanager.win_condition); //down and left
+                    score += Recurse_Score(row_pos, i, 1, 1, board, player_piece, boardmanager.win_condition); //down and right
                 }
             }
             return score;
         }
 
-        private static int Recurse_Score(int row_pos, int col_pos, int y_dir, int x_dir, int[,] board, int piece)
+        //this name makes no sense, i just havent changed it over from a previous version yet.
+        private static int Recurse_Score(int row_pos, int col_pos, int y_dir, int x_dir, int[,] board, int desired_piece, int winning_score)
         {
-            // checks recursively values along a certain path, starting at the given position and incrementing the given amount x and y.
-            //currently the only thing it does is check the next cell on the path and increase the score by 1 if it likes what it sees.
-
             int score = 0;
+            int board_height = board.GetLength(0);
+            int board_width = board.GetLength(1);
 
-            if (row_pos + y_dir > board.GetLength(0) - 1 || col_pos + x_dir > board.GetLength(1) - 1) return 0; //if the next thing to be checking is out of bounds, return
-            if (row_pos + y_dir < 0 || col_pos + x_dir < 0) return 0; //out of bounds in the other direction.
-            if (row_pos > board.GetLength(0) - 1 || col_pos > board.GetLength(1) - 1) return 0; //if the initial position is out of bounds, return
+            int piece = board[row_pos, col_pos];
+            //if the top piece isnt the desired piece, then you are done. return 0.
+            if (board[row_pos, col_pos] != piece) return score;
 
-            if (board[row_pos, col_pos] != piece) return 0;
+            //while its still a connected line of pieces
+            while(board[row_pos, col_pos] == piece)
+            {
+                //if increasing the value won't push things out of bounds. (checks is greater than board size and if less than 0
+                if (row_pos + y_dir < board_height && col_pos + x_dir < board_width && col_pos + x_dir >=0 && row_pos + y_dir >=0)
+                {
+                    row_pos += y_dir;
+                    col_pos += x_dir;
+                }
+                //if its hitting a wall, then force stop the loop
+                else break;
+            }
 
-            if (board[row_pos + y_dir, col_pos + x_dir] == piece) score += 1;
+            //so now the row_pos and col_pos are all the way along the direction that is supposed to be being checked at the moment. 
+            //from this point, go all the way back in the other direction, counting how many pieces you hit along the way until either a wall or a blank space is hit.
 
-            else if (board[row_pos + y_dir, col_pos + x_dir] == 0)
+            while(board[row_pos,col_pos] == piece)
             {
                 score += 1;
-                return score;
+                //check if decreasing the value would put things out of bounds.
+                if (row_pos - y_dir >= 0 && col_pos - x_dir >= 0  && row_pos - y_dir <board_height && (col_pos - x_dir < board_width))
+                {
+                    row_pos -= y_dir;
+                    col_pos -= x_dir;
+                }
+                //if things get out of bounds, force stop the loop
+                else break;
             }
 
-            else
+            //if a wall or enemy piece was hit in the previous loop, the current location val will not be 0. if that is the case, then check if there are enough pieces(score) to call it a win
+            if(board[row_pos, col_pos] != 0)
             {
-                score = 0;
-                return score;
+                if (score >= winning_score)
+                {
+                    if (piece != desired_piece) { if (Math.Abs(score - winning_score) < 2) return score + 4; } //meaning the other side is about to win, so really do this move.
+                    else return score + 2;
+                }
+                //this is a very good thing, so add more score than usual i guess. dunno how much yet. 2 for now.
+
+                else return 0; //if there arent enough pieces, then its a worthless configuration, so return 0 as score.
             }
 
-            return Recurse_Score(row_pos + y_dir, col_pos + x_dir, y_dir, x_dir, board, piece);
+            //at this point you need to be counting the amount of blank spaces that remain avaliable in whatever direction.
+            int blank_spaces = 0;
+
+            while (board[row_pos, col_pos] == 0)
+            {
+                blank_spaces += 1;
+                //go backwards along the line as long as it isnt out of bounds
+                if (row_pos - y_dir >= 0 && col_pos - x_dir >= 0   && row_pos - y_dir < board_height && col_pos - x_dir < board_width)
+                {
+                    row_pos -= y_dir;
+                    col_pos -= x_dir;
+                }
+                else break;
+            }
+
+            //now the number of blank spaces can be combined with the number of pieces found in the line.
+            //if there are enough for a win to be possible, return score. else return 0;
+            if (blank_spaces + score >= winning_score) return score;
+            else return 0;
+
+
+            //and now for copious testing.
         }
 
         public static int MiniMax(BoardManager boardmanager, Tree t, int player, int max_depth)
@@ -75,7 +126,7 @@ namespace Connect4_Attempt2
 
             foreach (Node child in n.children)
             {
-                if (Min_Value(boardmanager, child, player, max_depth, 1) > Board_Score(boardmanager, max_node.board, player))
+                if (Maximum_Value(boardmanager, child, player, max_depth, 1) > Board_Score(boardmanager, max_node.board, player))
                 {
                     max_node = child;
                 }

@@ -38,7 +38,7 @@ namespace Connect4_Attempt2
         internal int[,] PlayMove(int move, int player, int[,] board)
         {
             int[,] new_board = new int[board.GetLength(0),board.GetLength(1)];
-            for(int y = 0; y < board.GetLength(0); y++)//copy board to new board. since copy by reference is no bueno.ll
+            for(int y = 0; y < board.GetLength(0); y++)//copy board to new board. since copy by reference is no bueno.
             { for (int x = 0; x < board.GetLength(1); x++)
                 { new_board[y, x] = board[y, x]; }
             } 
@@ -157,6 +157,17 @@ namespace Connect4_Attempt2
             output = output.Replace('1', 'r').Replace('2', 'b');
 
             Console.WriteLine(output);
+        }
+
+        public int[,] Copy_Board(int[,] board)
+        {
+            int[,] new_board = new int[board.GetLength(0), board.GetLength(1)];
+            for (int y = 0; y < board.GetLength(0); y++)//copy board to new board. since copy by reference is no bueno.
+            {
+                for (int x = 0; x < board.GetLength(1); x++)
+                { new_board[y, x] = board[y, x]; }
+            }
+            return new_board;
         }
     }
 }
