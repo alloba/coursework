@@ -6,6 +6,7 @@ namespace Connect4_Attempt2
     {
         public int[,] board;
         public int move_made;
+        public int score = 0;
         public List<Node> children;
 
         public Node(int[,] given_board, int move=-1)

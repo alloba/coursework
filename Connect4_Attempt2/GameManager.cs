@@ -15,7 +15,7 @@ namespace Connect4_Attempt2
         BoardManager boardmanager;
         int current_turn;
 
-        int time_to_compute;
+        double time_to_compute;
         int borg_results;
 
         public int[] Get_Setup()
@@ -30,13 +30,13 @@ namespace Connect4_Attempt2
             Console.WriteLine("enter win condition");
             Int32.TryParse(Console.ReadLine(), out win_condition);
 
-            Console.WriteLine("Which color would you like to be? red or blue (r/b)? Red Goes first, blue goes second.");
+            Console.WriteLine("Are you red or blue? (Type 1/r for red, 2/b for blue)");
             string response = Console.ReadLine();
             if (response.Equals("r") || response.Equals("red") || response.Equals("1")) { player_turn = 1; }
             else player_turn = 2;
 
             Console.WriteLine("enter time to give the computer (in seconds)");
-            Int32.TryParse(Console.ReadLine(), out time_to_compute);
+            Double.TryParse(Console.ReadLine(), out time_to_compute);
             time_to_compute *= 1000;
 
             Console.Clear();
@@ -69,69 +69,97 @@ namespace Connect4_Attempt2
                 Console.WriteLine("Last Move Made: " + most_recent_move);
                 if (player_turn == current_turn) //if its the player's turn, get the player's input
                 {
-                    int player_move = Get_Player_Input();
-                    while (boardmanager.TestMove(player_move, tree.root.board) == false) //if the player doesnt give a valid move, keep asking.
-                    {
-                        Console.Write("Not a Valid Move\n");
-                        player_move = Get_Player_Input();
-                    }
-                    most_recent_move = player_move;
+                    //player code
+                    //int player_move = Get_Player_Input();
+                    //while (boardmanager.TestMove(player_move, tree.root.board) == false) //if the player doesnt give a valid move, keep asking.
+                    //{
+                    //    Console.Write("Not a Valid Move\n");
+                    //    player_move = Get_Player_Input();
+                    //}
+                    //most_recent_move = player_move;
+
+
+                    //computer v. computer code
+                    Console.Write("\nBoop Beep Bop\n");
+
+                    int seconds = DateTime.Now.Second;
+                    borg_results = 1;
+                    while (boardmanager.TestMove(borg_results, tree.root.board) == false) borg_results += 1;
+
+
+                    bool move_made = false;
+
+
+
+                    Thread t1 = new Thread(get_move);
+                    Thread t3 = new Thread(get_move);
+                    Thread t5 = new Thread(get_move);
+                    Thread t7 = new Thread(get_move);
+                    Thread t9 = new Thread(get_move);
+
+                    t1.Start(2);
+                    t3.Start(4);
+                    t5.Start(6);
+                    t7.Start(8);
+                    t9.Start(10);
+                    //get_move(2);
+                    //tree.Generate_Branches(1,current_turn);
+                    Thread.Sleep((int)time_to_compute);
+
+                    t1.Abort();
+                    t3.Abort();
+                    t5.Abort();
+                    t7.Abort();
+                    t9.Abort();
+
+                    if (boardmanager.TestMove(borg_results, tree.root.board) == false) borg_results = 1;
+                    while (boardmanager.TestMove(borg_results, tree.root.board) == false) borg_results += 1;
+
+                    most_recent_move = borg_results;
+
+
                 }
 
                 else // if it is the computer's turn, bust out alllllll the code. 
                 {
                     //computer stuff
                     //assign the recommended move to "most_recent_move"
-                    //until this happens, its just going to submit whatever the player did last, since the most_recent_move isn't updated.
-                    Console.Write("Boop Beep Bop");
+                    
+                    Console.Write("\nBoop Beep Bop\n");
 
                     int seconds = DateTime.Now.Second;
                     borg_results = 1;
-
+                    while (boardmanager.TestMove(borg_results, tree.root.board) == false) borg_results += 1;
 
                     bool move_made = false;
-                    int other_player;
-                    if (current_turn == 1) other_player = 2;
-                    else other_player = 1;
+                    
 
-                    //if putting a piece anywhere on the board would cause the other side to win, block it.
-                    for (int i = 1; i <= boardmanager.width; i++)
-                    {
-                        int[,] future_board = boardmanager.PlayMove(i, other_player, tree.root.board);
-                        bool result = boardmanager.CheckWin(future_board, i);
-                        if (result)
-                        {
-                            borg_results = i;
-                            move_made = true;
-                            break;
-                        }
+                    
+                    Thread t1 = new Thread(get_move);
+                    Thread t3 = new Thread(get_move);
+                    Thread t5 = new Thread(get_move);
+                    Thread t7 = new Thread(get_move);
+                    Thread t9 = new Thread(get_move);
 
-                    }
+                    t1.Start(2);
+                    t3.Start(4);
+                    t5.Start(6);
+                    t7.Start(8);
+                    t9.Start(10);
+                    
+                    Thread.Sleep((int)time_to_compute);
+             
+                    t1.Abort();
+                    t3.Abort();
+                    t5.Abort();
+                    t7.Abort();
+                    t9.Abort();
+                    
+                    if (boardmanager.TestMove(borg_results, tree.root.board) == false) borg_results =1;
+                    while (boardmanager.TestMove(borg_results, tree.root.board) == false) borg_results += 1;
 
-                    if (!move_made)
-                    {
-                        Thread t1 = new Thread(get_move);
-                        Thread t3 = new Thread(get_move);
-                        Thread t5 = new Thread(get_move);
-                        Thread t7 = new Thread(get_move);
-                        Thread t9 = new Thread(get_move);
-
-                        t1.Start(1);
-                        t3.Start(3);
-                        t5.Start(5);
-                        t7.Start(7);
-                        t9.Start(9);
-
-                        Thread.Sleep(time_to_compute);
-
-                        t1.Abort();
-                        t3.Abort();
-                        t5.Abort();
-                        t7.Abort();
-                        t9.Abort();
-                    }
                     most_recent_move = borg_results;
-
+                    //Thread.Sleep(8000);
                     //Create Trees
                     //Evaluate through minimax
                     //recommend a move
@@ -169,10 +197,14 @@ namespace Connect4_Attempt2
 
         private void Display_Board(int[,] board)
         { //hopefully this gets replaced eventuall by a gui. we'll see.
-            string output = "";
+            string output = " ";
 
             int height = board.GetLength(0);
             int width = board.GetLength(1);
+
+            string topbit = " ";
+            for (int i = 0; i < width; i++) topbit += (i + 1) + "|";
+            topbit += "\n";
 
             output += new string('═', width * 2) + "\n";
 
@@ -185,12 +217,16 @@ namespace Connect4_Attempt2
                 }
                 output += "|\n";
             }
+            output += " ";
             output += new string('═', width * 2) + "\n";
 
-            output = output.Replace('1', 'r').Replace('2', 'b');
+            output = output.Replace('1', 'R').Replace('2', 'B').Replace('0', ' ');
+
+            
+
             output += "\n";
 
-            Console.Write(output);
+            Console.Write(topbit + output);
         }
 
         private void get_move(object depth)
@@ -198,7 +234,9 @@ namespace Connect4_Attempt2
             Tree junk_tree = new Tree(boardmanager,new Node(boardmanager.Create_Blank_Board()));
             junk_tree.root.board = boardmanager.Copy_Board(tree.root.board);
             int move = 0;
-            move = Evaluator.MiniMax(boardmanager, junk_tree, current_turn, Convert.ToInt32(depth)); //definitely dont go above 10 levels or so.
+            move = Evaluator.geteval(boardmanager, junk_tree, current_turn, Convert.ToInt32(depth),true);
+            //move = Evaluator.MiniMax(boardmanager, junk_tree.root, current_turn, Convert.ToInt32(depth),true);
+            //move = Evaluator.MiniMax(boardmanager, junk_tree, current_turn, Convert.ToInt32(depth)); //definitely dont go above 10 levels or so.
             borg_results = move;
             Console.Write("\nDid the thing:" + depth + " Move Recommended: " + move);
         }

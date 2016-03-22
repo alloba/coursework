@@ -65,7 +65,7 @@ namespace Connect4_Attempt2
         {
             int column = most_recent_move - 1;
             int row = 0;
-            while (board[row, column] == 0) row += 1; //scrolls down until it finds where the most recently placed piece actually winded up
+            while (board[row, column] == 0) row += 1; //scrolls down until it finds where the most recently placed piece actually wound up
             int piece = board[row, column]; //assumes that whatever was found there is what we are checking for (no reason it shouldnt be)
 
             int consecutive_pieces = 0;
