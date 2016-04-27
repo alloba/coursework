@@ -175,12 +175,18 @@ def open_csv(filename):
         return gridworld
 
 if __name__ == "__main__":
-    c = Gridworld(obstacles=[(7, 3)], goal=(10, 10))
-    sarsa = SARSA(gridworld=c, alpha=.9, epsilon=.9, gamma=.9, lamb=.9)
+    gridworld = Gridworld(obstacles=[(5, 5), (5, 6), (5, 7), (5, 8), (5, 9),
+                                           (12, 10), (12, 9), (12, 8), (12, 11),
+                                           (13, 9), (14, 9),
+                                           (8, 13), (9, 13), (10, 13), (11, 13), (7, 13),
+                                           (8, 5), (9, 5), (10, 5), (11, 5),
+                                           (2, 17), (17, 17), (19, 16), (18, 1), (1, 2)],
+                                goal=(10, 10))
+    sarsa = SARSA(gridworld=gridworld, alpha=.9, gamma=.7, epsilon=0.10, lamb=.3)
 
-    for i in range(100):
+    for i in range(10000):
         print(i)
         sarsa.episode()
         #time.sleep(0.001)
-
+    save_csv(sarsa.gridworld, 'gridworld.csv')
 
