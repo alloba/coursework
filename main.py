@@ -1,145 +1,152 @@
 import tkinter
-from tkinter.ttk import *
 import tkinter.filedialog
+
 import Sarsa
 import threading
+from multiprocessing.pool import ThreadPool
 
-def mainwindow_setup():
-    global window
+class TKApp:
+    def __init__(self, window, gridworld):
 
-    window = tkinter.Tk()
-    window.title("Project 1")
-    #window.geometry('800x400')
-    window.configure(background='grey')
+        # main window setup
+        self.window = window
+        window.title("Project 1")
+        window.configure(background='grey')
+        menubar = tkinter.Menu(window)
+        menubar.add_command(label="Open File", command=self.open_file)
+        menubar.add_command(label='Reset Q Table', command=self.reset_q)
+        menubar.add_command(label='Save Gridworld', command=self.save_gridworld)
+        menubar.add_command(label='Update Toggle', command=self.update_canvas_toggle)
+        window.configure(menu=menubar)
 
-    menubar = tkinter.Menu(window)
-    menubar.add_command(label="Open File", command=openfile)
-    menubar.add_command(label='Reset Q Table', command=reset_q)
-    menubar.add_command(label='Create new Gridworld', command=new_gridworld)
-    menubar.add_command(label='Save Gridworld', command=save_gridworld)
+        # display canvas setup
+        self.canvas = tkinter.Canvas(window, width=800, height=800, bg='white')
+        self.canvas.pack()
 
-    menubar.add_command(label='Update', command=update_canvas)
-    window.configure(menu=menubar)
+        #class variables that dont bind so neatly to tkinter modules
+        self.update_switch = False
+        self.gridworld = gridworld
+        self.sarsa = Sarsa.SARSA(gridworld=self.gridworld, alpha=.9, gamma=.7, epsilon=0.10, lamb=.3)
+        self.processor = Processor(self.sarsa)
+        self.previous_visited = []
 
-    #window.bind('<Return>', submitinput)
-    #window.bind('<Up>', previousinputentry)
+        self.box_list = []
+        for i in range(20):
+            for j in reversed(range(20)):
+                self.box_list.append(self.canvas.create_rectangle(i * 40, j * 40, i * 40 + 40, j * 40 + 40, fill='red'))
+        for box in self.box_list:
+            self.canvas.itemconfig(box, fill='white')
 
+        self.arrow_list = []
+        for i in range(20):
+            for j in reversed(range(20)):
+                self.arrow_list.append(self.canvas.create_text(i * 40 + 20, j * 40 + 20))
+        for arrow in self.arrow_list:
+            self.canvas.itemconfig(arrow, text='b')
 
-def display_setup():
-    global window, box_list, arrow_list
-    #display_frame = Frame(window)
+    def display(self):
+        # aka the slowest part of the program and the reason for much sadness
+        for i in range(20):
+            for j in reversed(range(20)):
+                # for the sake of trying to speed up canvas draws,
+                # this compares the text at every position and only changes it if needed.
+                # not sure how much time this actually saves, but at least i tried.
 
-    #display_frame.pack()
-    #label_list = [[Label(display_frame, text=0) for x in range(20)] for y in range(20)]
-    #for x in range(len(label_list)):
-    #    for y in range(len(label_list[x])):
-    #        label_list[x][y].grid(row=x, column=y, sticky='nwse')
+                value = max(self.gridworld.Q[(i, j)])
+                index = self.gridworld.Q[(i, j)].index(value)
+                draw_value = ''
+                if index == 0:
+                    draw_value = '<'
+                elif index == 1:
+                    draw_value = 'v'
+                elif index == 2:
+                    draw_value = '>'
+                elif index == 3:
+                    draw_value = '^'
+                if draw_value is not self.canvas.itemcget(self.arrow_list[i*20 + j], 'text'):
+                    self.canvas.itemconfig(self.arrow_list[i*20 + j], text=draw_value)
 
-    global canvas, box_list
-    canvas = tkinter.Canvas(window, width=800, height=800, bg='white')
-    canvas.pack()
+        visited_list = self.processor.result
+        if visited_list:
+            cval = 254
+            # fill in previous colored cells with white so the entire thing doesnt fill up with color
+            if self.previous_visited:
+                for val in self.previous_visited:
+                    position = val[0] * 20 + val[1]
+                    self.canvas.itemconfig(self.box_list[position], fill='white')
+            self.previous_visited = visited_list
+            # mark the path taken to the goal in (poorly varying) colors
+            for cell in visited_list:
+                if cell != (-1, -1):
+                    color = "#%02d%02d%02d" % (255, max(cval, 100), max(cval, 100))
+                    position = cell[0] * 20 + cell[1]
+                    self.canvas.itemconfig(self.box_list[position], fill=color)
+                    cval -= 5
 
-    size = 20
+        goal = self.gridworld.goal
+        self.canvas.itemconfig(self.box_list[goal[0] * 20 + goal[1]], fill='gold')
 
-    box_list = []
-    for i in range(size):
-        for j in range(size):
-            box_list.append(canvas.create_rectangle(i*40, j*40, i*40+40, j*40+40, fill='red', ))
-    for box in box_list:
-        canvas.itemconfig(box, fill='red')
+        obstacles = [key for key in self.gridworld.obstacles]
+        for item in obstacles:
+            self.canvas.itemconfig(self.box_list[item[0] * 20 + item[1]], fill='lime')
 
-    for box in box_list[1::3]:
-        canvas.itemconfig(box, fill='blue')
+        if self.update_switch:
+            self.processor.go()
+            self.window.after(5, self.display)
 
-    arrow_list=[]
-    for i in range(size):
-        for j in range(size):
-            arrow_list.append(canvas.create_text(i*40+20, j*40+20, text='a'))
-    for arrow in arrow_list:
-        canvas.itemconfig(arrow, text='b')
+    def reset_q(self):
+        self.gridworld.reset_q()
+        self.sarsa.gridworld = self.gridworld
 
+    def update_canvas_toggle(self):
+        self.update_switch = not self.update_switch
+        self.processor.running = not self.processor.running
+        self.processor.go()
+        if self.update_switch:
+            self.window.after(5, self.display)
 
+    def save_gridworld(self):
+        Sarsa.save_csv(self.gridworld, 'gridworld.csv')
 
-
-def sarsa_tick():
-    sarsa.episode(5)
-
-
-def update_canvas():
-
-    global canvas, box_list, arrow_list, sarsa, gridworld
-
-    for x, y, z in zip(box_list, gridworld.Q, arrow_list):
-        value = max(gridworld.Q[y])
-        index = gridworld.Q[y].index(value)
-        if index == 0:
-            canvas.itemconfig(z, text='<')
-        if index == 1:
-            canvas.itemconfig(z, text='v')
-        if index == 2:
-            canvas.itemconfig(z, text='>')
-        if index == 3:
-            canvas.itemconfig(z, text='^')
-        ######
-        minimum = -0.5
-        maximum = 0.5
-        minimum, maximum = float(minimum), float(maximum)
-        ratio = 2 * (value-minimum) / (maximum - minimum)
-        b = int(max(0, 255*(1 - ratio)))
-        r = int(max(0, 255*(ratio - 1)))
-        g = 255 - b - r
-        color = "#%02x%02x%02x" % (r, g, b)
-        ######
+    def open_file(self):
+        filename = tkinter.filedialog.askopenfilename(parent=self.window)
 
         try:
-            canvas.itemconfig(x, fill=color)
-        except:
-            canvas.itemconfig(x, fill='black')
-    goal = gridworld.goal
-    canvas.itemconfig(box_list[goal[0]*20 + goal[1]], fill='gold')
+            self.gridworld = Sarsa.open_csv(filename)
+            self.sarsa.gridworld = self.gridworld
 
-    t = threading.Thread(target=sarsa_tick)
-    t.daemon = True
-    t.start()
+        except SyntaxError as e:
+            print("Improperly Formatted CSV File")
 
-    canvas.after(50, update_canvas)
+        self.display()
 
 
+gridworld = Sarsa.Gridworld(obstacles=[(5, 5), (5, 6), (5, 7), (5, 8), (5, 9),
+                                       (12, 10), (12, 9), (12, 8), (12, 11),
+                                       (13, 9), (14, 9)],
+                            goal=(10, 10))
 
-def reset_q():
-    global gridworld
-    gridworld.reset_q()
-
-
-def new_gridworld():
-    global gridworld
-    gridworld = Sarsa.Gridworld(gridworld.size, gridworld.goal, gridworld.obstacles)
+sarsa = Sarsa.SARSA(gridworld=gridworld, alpha=.9, gamma=.7, epsilon=0.10, lamb=.3)
 
 
-def save_gridworld():
-    global gridworld
-    Sarsa.save_csv(gridworld, 'gridworld.csv')
+class Processor:
+    # my attempt at reducing hanging on the GUI by offloading the actual sarsa stuff to another thread
+    # in the end it did speed things up a bit, but not nearly as well as i had hoped.
+    def __init__(self, sarsa):
+        self.pool = ThreadPool(processes=1)
+        self.running = False
+        self.sarsa = sarsa
+        self.result = []
+
+    def go(self):
+        if self.running:
+            self.result = self.pool.apply(self.sarsa.episode)
+
+    def toggle(self):
+        self.running = not self.running
 
 
-def openfile():
-    global filename
-    filename = tkinter.filedialog.askopenfilename(parent=window)
+root = tkinter.Tk()
+app = TKApp(root, gridworld)
+root.mainloop()
 
-    try:
-        gridworld = Sarsa.open_csv(filename)
-
-    except SyntaxError as e:
-        print("Improperly Formatted CSV File")
-
-
-global gridworld, sarsa, t
-
-import random
-random.seed(0)
-
-gridworld = Sarsa.Gridworld(obstacles=[(2,2), (3,3)], goal=(15,15))
-sarsa = Sarsa.SARSA(gridworld=gridworld, alpha=0.7, gamma=0.4, lamb=0.5, epsilon=0.4)
-mainwindow_setup()
-display_setup()
-window.after(1000, update_canvas)
-window.mainloop()

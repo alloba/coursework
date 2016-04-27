@@ -2,23 +2,33 @@ import random
 import itertools
 import csv
 
+import time
+
+import math
+
 
 class Gridworld:
     def __init__(self, size=20, goal=None, obstacles=[]):
         self.size = size
+        # obstacle input should be a list of tuples for coordinates of walls
         self.obstacles = obstacles
 
         if goal is None:
-            self.goal = [random.randint(0, size-1), random.randint(0, size-1)]
+            self.goal = (random.randint(0, size-1), random.randint(0, size-1))
         else:
             self.goal = goal
 
-        self.Q = {x: [(random.random()-.5)/1 for y in range(4)] for x in itertools.product(range(self.size), repeat=2)}
+        self.Q = {x: [(random.random()-.5)/10 for y in range(4)] for x in itertools.product(range(self.size), repeat=2)}
         self.e = {x: [0 for y in range(4)] for x in itertools.product(range(self.size), repeat=2)}
 
         self.rewards = {x: 0.0 for x in itertools.product(range(self.size), repeat=2)}
         for wall in obstacles:
             self.rewards[wall] = -1
+        self.rewards[self.goal] = 1
+
+
+        self.Q[(-1,-1)] = [.01,.01,.01,.01]
+        self.rewards[(-1,-1)] = -1
 
     def get_reward(self, position):
         if tuple(position) not in self.rewards:
@@ -28,77 +38,91 @@ class Gridworld:
 
     def reset_e(self):
         self.e = {x: [0 for y in range(4)] for x in itertools.product(range(self.size), repeat=2)}
+        self.e[(-1,-1)] = [0,0,0,0]
 
     def reset_q(self):
         self.Q = {x: [(random.random()-0.5)/10 for y in range(4)] for x in itertools.product(range(self.size), repeat=2)}
+        self.Q[(-1,-1)] = [.01,.01,.01,.01]
 
     pass
 
 
 class SARSA:
-    def __init__(self, gridworld, alpha, gamma, lamb, epsilon):
+    def __init__(self, gridworld, alpha, epsilon, gamma, lamb):
         self.gridworld = gridworld
         self.alpha = alpha
         self.gamma = gamma
-        self.lamb = lamb
         self.epsilon = epsilon
+        self.lamb = lamb
 
-    def episode(self, count):
-        # repeat for each step of episode until state is terminal
-        # meaning in bounds, not on the goal, and not hitting an obstacle
-        # also within running bounds, which are yet to be set
+        self.greed_decay = .001
 
-        for i in range(count):
-            num = 0
-            #initialize state and action
-            state = (random.randint(0, self.gridworld.size - 1), random.randint(0, self.gridworld.size - 1))
-            action = self.get_action(state)
-            while (state in self.gridworld.Q) and (state is not self.gridworld.goal) and (state not in self.gridworld.obstacles):
-                state, action = self.episode_step(state, action)
-
-    def episode_step(self, state, action):
+    def episode(self):
         self.gridworld.reset_e()
-        state_prime = self.take_action(state, action)
-        if state_prime not in self.gridworld.Q:
-            return (-1, -1), -1
+        state = (random.randint(0, self.gridworld.size-1), random.randint(0, self.gridworld.size-1))
+        action = self.get_action(state)
 
-        reward = self.gridworld.get_reward(state_prime)
-        action_prime = self.get_action(state_prime)
+        visited_list = [state]
 
-        derivate = reward + self.gamma * self.get_q_val(state_prime, action_prime) - self.get_q_val(state, action)
+        reward = self.gridworld.get_reward(state)
+        while reward is not 1 and reward is not -1:
+            state_prime = self.take_action(state, action)
 
-        self.gridworld.e[state][action] += 1
+            #if state_prime == state:
+            #    #if a wall is hit, do this code or reward wont send back right
+            #    reward = -1
+            #    self.gridworld.e[state][action] += 1
+            #    derivate = reward + self.gamma * self.gridworld.Q[state_prime][action]
+            #    for s in self.gridworld.Q:
+            #        for a in range(4):
+            #            self.gridworld.Q[s][a] += self.alpha * self.gridworld.e[s][a] * derivate
+            #            self.gridworld.e[s][a] *= self.lamb * self.gamma
+            #            if math.isnan(self.gridworld.Q[s][a]):
+            #                print("nan")
+            #    break
+            ####
 
-        for coord in self.gridworld.Q:
-            for i in range(4):
-                self.gridworld.Q[coord][i] += self.alpha * derivate * self.gridworld.e[coord][i]
-                self.gridworld.e[coord][i] = self.gridworld.e[coord][i] * self.gamma * self.lamb
+            reward = self.gridworld.get_reward(state_prime)
+            action_prime = self.get_action(state_prime)
 
-        state = state_prime
-        action = action_prime
+            derivate = reward + self.gamma * self.gridworld.Q[state_prime][action_prime] - self.gridworld.Q[state][action]
+            self.gridworld.e[state][action] += 1
 
-        return state, action
+            for s in self.gridworld.Q:
+                for a in range(4):
+                    self.gridworld.Q[s][a] += self.alpha * self.gridworld.e[s][a] * derivate
+                    self.gridworld.e[s][a] *= self.lamb * self.gamma
+                    if math.isnan(self.gridworld.Q[s][a]):
+                        print("nan")
+
+            action = action_prime
+            state = state_prime
+            visited_list.append(state)
+
+        if self.epsilon < .95:
+            self.epsilon *= 1+self.greed_decay
+
+
+        if state == self.gridworld.goal:
+            return visited_list
 
     def get_action(self, state):
-
-        if random.random() < self.gamma:
+        if random.random() > self.epsilon:
             return random.randint(0, 3)
         else:
             return self.gridworld.Q[state].index(max(self.gridworld.Q[state]))
-        pass
 
     def take_action(self, position, move):
-        if move % 2 == 0:
-            new_position = (position[0] - 1, position[1])
-        else:
-            new_position = (position[0], position[1] - 1)
-        return new_position
 
-    def get_q_val(self, state, action):
-        if state in self.gridworld.Q:
-            return self.gridworld.Q[state][action]
+        if move % 2 == 0:
+            new_state = (position[0] + (move-1), position[1])
         else:
-            return -10
+            new_state = (position[0], position[1] + (move-2))
+
+        if new_state[0] < 0 or new_state[0] > self.gridworld.size - 1 or new_state[1] < 0 or new_state[1] > self.gridworld.size - 1:
+            return (-1, -1)
+
+        return new_state
 
 
 def save_csv(gridworld, filename):
@@ -135,6 +159,7 @@ def open_csv(filename):
         goal = next(reader)
         goal[0] = int(goal[1])
         goal[1] = int(goal[1])
+        goal = tuple(goal)
 
         i = int(''.join(next(reader)))
         for x in range(i):
@@ -150,22 +175,12 @@ def open_csv(filename):
         return gridworld
 
 if __name__ == "__main__":
-    c = Gridworld(obstacles=[(7, 3), (1,1)])
-    sarsa = SARSA(c, .5, .5, .5, .5)
-    sarsa.episode(2)
+    c = Gridworld(obstacles=[(7, 3)], goal=(10, 10))
+    sarsa = SARSA(gridworld=c, alpha=.9, epsilon=.9, gamma=.9, lamb=.9)
 
-    save_csv(c, 'test.csv')
-    grid = open_csv('test.csv')
-    sarsa = SARSA(grid, .9, .9, .9, .9)
-    sarsa.episode(2)
+    for i in range(100):
+        print(i)
+        sarsa.episode()
+        #time.sleep(0.001)
 
-    while True:
-        print(
-            grid.Q[(10,10)].index(
-                max(grid.Q[(10,10)])
-            )
-        )
-        print(grid.Q[(10,10)])
-
-        sarsa.episode(100)
 
