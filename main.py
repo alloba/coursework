@@ -2,13 +2,12 @@ import tkinter
 import tkinter.filedialog
 
 import Sarsa
-import threading
-from multiprocessing.pool import ThreadPool
 
 class TKApp:
     def __init__(self, window, gridworld, sarsa):
 
         # main window setup
+        # mostly menu bar stuff
         self.window = window
         window.title("Project 1")
         window.configure(background='grey')
@@ -36,6 +35,8 @@ class TKApp:
         for box in self.box_list:
             self.canvas.itemconfig(box, fill='white')
 
+        # i feel like there should be a nice way to combine this with box_list, since they are really the same thing
+        # with different content, but i couldn't find a way to do it really online.
         self.arrow_list = []
         for i in range(20):
             for j in reversed(range(20)):
@@ -68,7 +69,7 @@ class TKApp:
         visited_list = self.sarsa.episode()
         if visited_list:
             cval = 254
-            # fill in previous colored cells with white so the entire thing doesnt fill up with color
+            # fill in previous colored cells with white so the entire thing doesnt fill up with previous paths
             if self.previous_visited:
                 for val in self.previous_visited:
                     position = val[0] * 20 + val[1]
@@ -93,14 +94,20 @@ class TKApp:
             self.window.after(5, self.display)
 
     def reset_q(self):
+        # not exactly the ideal total reset, but it works.
+        # really the main problem is that it doesnt allow you to change the initial conditions as a user.
+        # it relies on good values from the outset of the program running
         self.gridworld.reset_q()
         self.sarsa.gridworld = self.gridworld
         self.sarsa.epsilon = .1
+
+        self.display()
 
     def update_canvas_toggle(self):
         self.update_switch = not self.update_switch
         if self.update_switch:
             self.window.after(5, self.display)
+
 
     def save_gridworld(self):
         Sarsa.save_csv(self.gridworld, 'gridworld.csv')
@@ -115,6 +122,8 @@ class TKApp:
         except SyntaxError as e:
             print("Improperly Formatted CSV File")
 
+        self.sarsa.epsilon = .90
+
         self.display()
 
 
@@ -122,11 +131,11 @@ if __name__ == '__main__':
     gridworld = Sarsa.Gridworld(obstacles=[(5, 5), (5, 6), (5, 7), (5, 8), (5, 9),
                                            (12, 10), (12, 9), (12, 8), (12, 11),
                                            (13, 9), (14, 9),
-                                           (8, 13), (9, 13), (10, 13), (11, 13), (7, 13),
+                                           (8, 13), (9, 13), (10, 13), (7, 13),
                                            (8, 5), (9, 5), (10, 5), (11, 5),
-                                           (2, 17), (17, 17), (19, 16), (18, 1), (1,2)],
+                                           (2, 17), (17, 17), (19, 16), (18, 1), (1, 2)],
                                 goal=(10, 10))
-    sarsa = Sarsa.SARSA(gridworld=gridworld, alpha=.9, gamma=.7, epsilon=0.10, lamb=.3)
+    sarsa = Sarsa.SARSA(gridworld=gridworld, alpha=.2, gamma=.7, epsilon=0.10, lamb=.5)
 
 
     root = tkinter.Tk()
