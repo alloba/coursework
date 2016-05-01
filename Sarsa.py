@@ -2,8 +2,6 @@ import random
 import itertools
 import csv
 
-import time
-
 import math
 
 
@@ -55,7 +53,7 @@ class SARSA:
         self.epsilon = epsilon
         self.lamb = lamb
 
-        self.greed_decay = .00002 # increases epsilon by 0.1 ever 5,000 iterations. which may or may not be a good value
+        self.greed_decay = .0004 # increases epsilon by ___ ever 200 iterations. which may or may not be a good value
 
         self.episode_count = 0  # for use in recording things. keep track of the number of times it's ran total.
         self.successful_trail_lengths = []  # for use in finding average path length. not used for much, but nice to see
@@ -65,12 +63,10 @@ class SARSA:
         # if it successfully navigates a path to the goal, will return a list of visited locations.
         # otherwise nothing is returned, although the algorithm still plays out the same.
 
-        # this particular part was not outlined in the pseudo code provided, by the way. Someone online suggested it was
-        # a typo or oversight on the part of the author. but it was mentioned with emphasis in class, so it worked out.
         self.gridworld.reset_e()
-        # #
 
         state = (random.randint(0, self.gridworld.size-1), random.randint(0, self.gridworld.size-1))
+        #state = (0, 0)
         action = self.get_action(state)
 
         self.episode_count += 1
@@ -87,6 +83,13 @@ class SARSA:
             reward = self.gridworld.get_reward(state_prime)
             action_prime = self.get_action(state_prime)
 
+            if len(visited_list) > 400:
+                # terminated paths that were stuck. removed from the final version.
+                #reward = -1
+                #print("broken")
+                pass
+
+
             derivate = reward + self.gamma * self.gridworld.Q[state_prime][action_prime] - self.gridworld.Q[state][action]
             self.gridworld.e[state][action] += 1
 
@@ -94,8 +97,7 @@ class SARSA:
                 for a in range(4):
                     self.gridworld.Q[s][a] += self.alpha * self.gridworld.e[s][a] * derivate
                     self.gridworld.e[s][a] *= self.lamb * self.gamma
-                    if math.isnan(self.gridworld.Q[s][a]):
-                        print("nan")
+
 
             action = action_prime
             state = state_prime
@@ -109,7 +111,10 @@ class SARSA:
         if self.episode_count % 200 == 0:
             print("Total number of episodes: " + str(self.episode_count))
             print("Percentage of hits over the last 200 episodes: " + str(len(self.successful_trail_lengths) / 200 * 100) + "%")
-            print("Average length of successful paths: " + str(sum(self.successful_trail_lengths) / len(self.successful_trail_lengths)))
+            try:
+                print("Average length of successful paths: " + str(sum(self.successful_trail_lengths) / len(self.successful_trail_lengths)))
+            except ZeroDivisionError:
+                print("Average length of successful paths: " + str(0))
             print(self.epsilon)
             print("_____________________________________________________\n")
             self.successful_trail_lengths = []
@@ -190,16 +195,17 @@ def open_csv(filename):
         return gridworld
 
 if __name__ == "__main__":
-    gridworld = Gridworld(obstacles=[(5, 5), (5, 6), (5, 7), (5, 8), (5, 9),
+    gridworld = Gridworld(obstacles=[(5, 6), (5, 7), (5, 8), (5, 9),
                                            (12, 10), (12, 9), (12, 8), (12, 11),
                                            (13, 9), (14, 9),
-                                           (8, 13), (9, 13), (10, 13), (7, 13),
+                                           (8, 13), (9, 13), (7, 13),
                                            (8, 5), (9, 5), (10, 5), (11, 5),
-                                           (2, 17), (17, 17), (19, 16), (18, 1), (1, 2)],
+                                           (2, 17), (17, 17), (19, 16), (18, 1)],
                                 goal=(10, 10))
-    sarsa = SARSA(gridworld=gridworld, alpha=.5, gamma=.5, epsilon=0.10, lamb=.5)
+    sarsa = SARSA(gridworld=gridworld, alpha=.5, gamma=.5, epsilon=0.50, lamb=.5)
 
-    for i in range(10000):
-        print(i)
+    for i in range(100000):
+        #print(i)
         sarsa.episode()
+    save_csv(gridworld, 'gridworld_half_everything.csv')
 

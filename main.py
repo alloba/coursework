@@ -3,13 +3,14 @@ import tkinter.filedialog
 
 import Sarsa
 
+
 class TKApp:
     def __init__(self, window, gridworld, sarsa):
 
         # main window setup
         # mostly menu bar stuff
         self.window = window
-        window.title("Project 1")
+        window.title("Project 3")
         window.configure(background='grey')
         menubar = tkinter.Menu(window)
         menubar.add_command(label="Open File", command=self.open_file)
@@ -22,7 +23,7 @@ class TKApp:
         self.canvas = tkinter.Canvas(window, width=800, height=800, bg='white')
         self.canvas.pack()
 
-        #class variables that dont bind so neatly to tkinter modules
+        # class variables that dont bind so neatly to tkinter modules
         self.update_switch = False
         self.gridworld = gridworld
         self.sarsa = sarsa
@@ -63,12 +64,12 @@ class TKApp:
                     draw_value = '>'
                 elif index == 3:
                     draw_value = '^'
-                if draw_value is not self.canvas.itemcget(self.arrow_list[i*20 + j], 'text'):
-                    self.canvas.itemconfig(self.arrow_list[i*20 + j], text=draw_value)
+                if draw_value is not self.canvas.itemcget(self.arrow_list[i * 20 + j], 'text'):
+                    self.canvas.itemconfig(self.arrow_list[i * 20 + j], text=draw_value)
 
         visited_list = self.sarsa.episode()
         if visited_list:
-            cval = 254
+            cval = 640
             # fill in previous colored cells with white so the entire thing doesnt fill up with previous paths
             if self.previous_visited:
                 for val in self.previous_visited:
@@ -78,10 +79,13 @@ class TKApp:
             # mark the path taken to the goal in (poorly varying) colors
             for cell in visited_list:
                 if cell != (-1, -1):
-                    color = "#%02d%02d%02d" % (255, max(cval, 100), max(cval, 100))
+                    color = "#%02d%02d%02d" % (100, max(cval, 200), max(cval, 200))
                     position = cell[0] * 20 + cell[1]
                     self.canvas.itemconfig(self.box_list[position], fill=color)
                     cval -= 5
+            position = visited_list[0][0] * 20 + visited_list[0][1]
+            color = "#%02d%02d%02d" % (255, 500, 255)
+            self.canvas.itemconfig(self.box_list[position], fill=color)
 
         goal = self.gridworld.goal
         self.canvas.itemconfig(self.box_list[goal[0] * 20 + goal[1]], fill='gold')
@@ -108,7 +112,6 @@ class TKApp:
         if self.update_switch:
             self.window.after(5, self.display)
 
-
     def save_gridworld(self):
         Sarsa.save_csv(self.gridworld, 'gridworld.csv')
 
@@ -122,24 +125,22 @@ class TKApp:
         except SyntaxError as e:
             print("Improperly Formatted CSV File")
 
-        self.sarsa.epsilon = .90
-
+        self.sarsa.epsilon = 1.0
+        self.sarsa.episode_count = 0
         self.display()
 
 
 if __name__ == '__main__':
-    gridworld = Sarsa.Gridworld(obstacles=[(5, 5), (5, 6), (5, 7), (5, 8), (5, 9),
-                                           (12, 10), (12, 9), (12, 8), (12, 11),
+    gridworld = Sarsa.Gridworld(obstacles=[(5, 6), (5, 7), (5, 8), (5, 9),
+                                           (12, 10), (12, 9), (12, 11),
                                            (13, 9), (14, 9),
-                                           (8, 13), (9, 13), (10, 13), (7, 13),
+                                           (8, 13), (9, 13), (7, 13),
                                            (8, 5), (9, 5), (10, 5), (11, 5),
-                                           (2, 17), (17, 17), (19, 16), (18, 1), (1, 2)],
+                                           (2, 17), (17, 17), (19, 16), (18, 1)],
                                 goal=(10, 10))
-    sarsa = Sarsa.SARSA(gridworld=gridworld, alpha=.2, gamma=.7, epsilon=0.10, lamb=.5)
-
+    sarsa = Sarsa.SARSA(gridworld=gridworld, alpha=.1, gamma=.9, epsilon=.4, lamb=.5)
 
     root = tkinter.Tk()
     app = TKApp(root, gridworld, sarsa)
 
     root.mainloop()
-
