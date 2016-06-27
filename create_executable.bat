@@ -1,1 +1,0 @@
-C:\ProgramData\chocolatey\lib\python3\tools\Scripts\nuitka.bat --recurse-all betterName.py
