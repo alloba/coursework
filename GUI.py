@@ -8,6 +8,11 @@ import pickle
 
 from Network import Network
 
+# as a note for the future if i ever bother working on this again, a lot of innacuracies
+# come from not centering the image before i send it off to be looked at by the nn.
+# so a straight line in the middle of the image is obviously a 1, but if it is
+# on the far side, likely it will not be correctly recognized.
+
 class TKApp:
     def __init__(self, window):
         self.window = window
