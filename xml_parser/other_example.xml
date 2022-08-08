@@ -1,0 +1,30 @@
+<root>
+	<node behavior = "Tired" response="">
+		<node behavior = "" response="Use Computer"/>
+		<node behavior="" response="Sleep"/>
+	</node>
+	
+	<node behavior="Grades Falling" response="">
+		<node behavior="" response="Evade"/>
+	</node>
+	
+	<node behavior="Annoying Person Coming Over" response="">
+	
+		<node behavior="Panick" response="">
+			<node behavior="" response="Flee"/>
+			<node behavior="" response="Accept your Fate"/>
+		</node>
+		
+		<node behavior="Turn the Tables" response="">
+			<node behavior="" response="I'll come over instead... Later."/>
+		</node>
+		
+		<node behavior="Negotiate" response="">
+			<node behavior="" response="I'm Busy"/>
+			<node behavior="" response="Pls no"/>
+			<node behavior="" response="Who are you again?"/>
+			<node behavior="" response="...I gotta go."/>
+		</node>
+		
+	</node>
+</root>

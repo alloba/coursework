@@ -1,0 +1,727 @@
+#include "msp430.h"                     ; #define controlled include file
+
+        NAME    main                    ; module name
+
+        PUBLIC  main                    ; make the main label vissible
+                                        ; outside this module
+        ORG     0FFFEh
+        DC16    init                    ; set reset vector to 'init' label
+
+        RSEG    CSTACK                  ; pre-declaration of segment
+        
+        
+        ;;;;;;;;;;;;;;;;;;;;
+        RSEG    DATA16_N
+        SnakeArray:     DS8     16   
+        
+        ;;
+        idirectionRight: DS8     2       
+        idirectionLeft:  DS8     2
+        idirectionUp:    DS8     2
+        idirectionDown:  DS8     2
+        ;;;;;;;;;;;;;;;;;;;;
+        
+        
+        
+        RSEG    CODE                    ; place program in 'CODE' segment
+
+init:   MOV     #SFE(CSTACK), SP        ; set up stack
+        ;;;;;;;;;;
+
+        
+       ;set values for direction variables
+        MOV.W   #00000001b,             idirectionRight
+        MOV.W   #00000010b,             idirectionLeft
+        MOV.W   #00000100b,             idirectionUp
+        MOV.W   #00001000b,             idirectionDown
+       
+       
+       
+        ;Set Pin Directions
+        MOV.B   #00000111b,     P1DIR
+        MOV.B   #00010111b,     P2DIR
+        ;;;
+        
+        ;Initial Values for Registers and SnakeArray
+        MOV.B   #77,    SnakeArray
+        MOV.B   #08,    SnakeArray+1
+        MOV.B   #87,    SnakeArray+2
+        MOV.B   #08,    SnakeArray+3
+        MOV.B   #00,    SnakeArray+4
+        MOV.B   #00,    SnakeArray+5
+        MOV.B   #00,    SnakeArray+6
+        MOV.B   #00,    SnakeArray+7
+        MOV.B   #00,    SnakeArray+8
+        MOV.B   #00,    SnakeArray+9
+        MOV.B   #00,    SnakeArray+10
+        MOV.B   #00,    SnakeArray+11
+        MOV.B   #00,    SnakeArray+12
+        MOV.B   #00,    SnakeArray+13
+        MOV.B   #00,    SnakeArray+14
+        MOV.B   #00,    SnakeArray+15
+        
+	MOV.B	#87,	R4 ;SNAKE HEAD LOC
+        MOV.B   #27,    R5 ;FOOD LOC
+        MOV.B   #2,     R6 ;SNAKE LENGTH
+	MOV.B	#0,	R7 ;GAME STATUS
+        MOV.B   #8,     R9 ;USER INPUT
+        
+        ;;;
+        
+        
+        ;Enable Interrupts 
+        BIS.B   #11110000b,     &P1IE   ;interrupts enabled for last 4 pins
+        BIS.B   #11110000b,     P1REN   ;pull up resistors, because it is crazy finicky without them 
+        BIS.B   #00000000b,     &P1IES  ;high/low edge triggered (i didnt notice that it made a difference in this case
+        BIC.B   #11110000b,     &P1IFG  ;clear the interrupts flag to start with (only clears the bits for 
+        
+        BIS.W   #GIE,   SR      ;Global Interrupt Enable
+        ;;;;;;;;;;;
+        
+        
+        
+        
+        
+        
+
+main:   NOP                             ; main program
+        MOV.W   #WDTPW+WDTHOLD,&WDTCTL  ; Stop watchdog timer
+        
+        CALL    #CheckFood  ;this was put here for testing reasons
+
+        CALL    #MoveSnake
+        CALL    #Delay
+        CALL    #Display  ;this isnt really needed here anymore, since it is called within Display 
+        CALL    #CheckFood
+        CALL	#CheckBounds
+		
+	TST	R7      
+	JNZ	WINLOSE
+        JNZ     init
+		
+		
+        JMP     main
+        
+        
+WINLOSE:
+    ;makes a pattern on the leds when the game is over
+    ;forgive the completely vague names of the labels here
+    MOV #0, R14
+    MOV #0, R15
+    A1Loop:
+      CMP       #8,  R15
+      JZ        A2Loop
+      MOV.B     R14, P1OUT
+      MOV.B     R15, P2OUT
+      BIS.B     #00010000b, P2OUT ;need to always have this pin on to actually display things
+      INC       R15
+      CALL      #ShortDelay
+      JMP A1Loop
+    A2Loop:
+      MOV       #0, R15
+      INC       R14
+      CMP       #8, R14
+      JZ        OtherBit
+      JMP       A1Loop
+      
+    OtherBit:
+    MOV #0, R14
+    MOV #0, R15
+    B1Loop:
+      CMP       #8,  R15
+      JZ        B2Loop
+      MOV.B     R15, P1OUT
+      MOV.B     R14, P2OUT
+      BIS.B     #00010000b, P2OUT
+      INC       R15
+      CALL      #ShortDelay
+      JMP B1Loop
+    B2Loop:
+      MOV       #0, R15
+      INC       R14
+      CMP       #8, R14
+      JZ        DoneWin
+      JMP       B1Loop
+
+DoneWin:
+        JMP init
+   
+        JMP $                           ; jump to current location '$'
+                                        ; (endless loop)
+        
+
+Delay:
+  ;slows the entire game down to reasonable levels. 
+  ;Display is called within the loop, to keep all the appropriate leds turned on
+  MOV.W #0x150, R10
+DelayCont:    
+  TST   R10
+  JZ    DoneDelay
+  DEC   R10
+  CALL  #Display
+  JMP   DelayCont
+  
+DoneDelay:
+  RET
+
+ShortDelay:
+  MOV.W #0x555, R8
+ShortDelayCont:
+  ;these are a bunch of nonsense operations to try to make this longer. probably not needed.
+  TST   R8
+  JZ    DoneDelay
+  DEC   R8
+  INC   R8
+  INC   R8
+  DEC   R8
+  DEC   R8
+  JMP   ShortDelayCont
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;MoveSnake - Updates Direction of all segments
+;          - Moves each segment (updates position value in array)
+MoveSnake:
+        
+        
+DirectionUpdateLoopStart:
+       ;updating direction happens from the back up to the front. otherwise the direction propogates all the way down the snake every time. 
+        MOV.B   R6,     R11
+        ADD.B   R6,     R11
+        DEC.B   R11
+        
+        MOV.B   R11,    R15
+        MOV.B   R11,    R14
+        DECD    R14
+	
+DirectionUpdateLoop:
+	CMP	#1,    R15
+	JZ	DirectionUpdateEnd
+	MOV.B	SnakeArray(R14),        SnakeArray(R15)
+	DECD	R15
+        DECD    R14
+	JMP	DirectionUpdateLoop
+	
+	
+DirectionUpdateEnd:	
+	
+
+MoveSnakeSegmentStart:
+        ;move current input to direction storage for first snake segment
+      	MOV.B	R9,	SnakeArray + 1
+
+	MOV.B	#0,	        R15
+	MOV.B	#1,	        R14
+	MOV.B   SnakeArray,     R4
+MoveSnakeSegmentLoop:
+	CMP	#16,    R15		;one step past 14, the last position byte
+	JZ	MoveSnakeSegmentEnd
+    
+        CMP.B	#00000001b,     SnakeArray(R14) 
+	JZ	MoveSegmentRight
+	CMP.B	#00000010b,     SnakeArray(R14) 
+	JZ	MoveSegmentLeft
+	CMP.B	#00000100b,     SnakeArray(R14)
+	JZ	MoveSegmentUp
+	CMP.B	#00001000b,     SnakeArray(R14) 
+	JZ	MoveSegmentDown
+	CMP.B   #00000000b,     SnakeArray(R14)
+        JZ      MoveSegmentNull
+        
+        MoveSegmentNull:
+                INC     R15
+                INC     R15
+                INC     R14
+                INC     R14
+                JMP     MoveSnakeSegmentLoop
+	MoveSegmentRight:
+		INC	SnakeArray(R15)
+		INC	R15 
+                INC     R15
+		INC	R14 
+                INC     R14
+		JMP	MoveSnakeSegmentLoop
+	MoveSegmentLeft:
+		DEC	SnakeArray(R15)
+		INC	R15 
+                INC     R15
+		INC	R14 
+                INC     R14
+		JMP	MoveSnakeSegmentLoop
+	MoveSegmentUp:
+		ADD.B 	#10,	SnakeArray(R15)
+		INC	R15 
+                INC     R15
+		INC	R14 
+                INC     R14
+		JMP	MoveSnakeSegmentLoop
+	MoveSegmentDown:
+		ADD.B	#-10,	SnakeArray(R15)
+		INC	R15 
+                INC     R15
+		INC	R14 
+                INC     R14
+		JMP	MoveSnakeSegmentLoop
+MoveSnakeSegmentEnd:
+        RET    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;Display - Converts stored position in the array to rows and columns
+;        - Turns on certain pins depending on row and column values
+;        - Also does this for the food location
+Display:
+;PINS SHOULD BE DEFINED AS OUTPUTS IN INIT
+;		PINS: 	        1.0 - col  
+;				1.1 - col  
+;				1.2 - col  
+;				2.0 - row
+;				2.1 - row
+;				2.2 - row
+
+
+	MOV.B	SnakeArray,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+        
+	MOV.B	SnakeArray+2,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+	
+        MOV.B	SnakeArray+4,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+	
+        MOV.B	SnakeArray+6,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+	
+        MOV.B	SnakeArray+8,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+	
+        MOV.B	SnakeArray+10,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+	
+        MOV.B	SnakeArray+12,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+	
+        MOV.B	SnakeArray+14,	R15
+	CALL	#SetRowColumn
+        CALL    #DisplayBit
+    ;Do the same, but with the food location this time
+	MOV.B	R5,	R15
+	CALL 	#SetRowColumn
+	CALL	#DisplayBit
+        
+    RET
+SetRowColumn:
+	MOV.B	#0,	R13		;
+	MOV.B	#0,	R14		;
+	
+SetRowLoop:
+	CMP	#11,    R15
+	JNC	SetColumnLoop
+	INC	R13
+	ADD	#-10,	R15
+	JMP	SetRowLoop
+SetColumnLoop:
+	CMP	#0,     R15
+	JZ	SetRowColumnDone
+	DEC	R15
+	INC	R14
+	JMP 	SetColumnLoop
+	
+SetRowColumnDone:
+	RET
+	
+DisplayBit:
+CheckColumns:
+bic.B   #00010000b,     P2OUT
+
+	CMP	#1,	R13
+	JZ	COL1
+	CMP	#2,	R13
+	JZ	COL2
+	CMP	#3,	R13
+	JZ	COL3
+	CMP	#4,	R13
+	JZ	COL4
+	CMP	#5,	R13
+	JZ	COL5
+	CMP	#6,	R13
+	JZ	COL6
+	CMP	#7,	R13
+	JZ	COL7
+	CMP	#8,	R13
+	JZ	COL8
+        JMP EndDisplay
+CheckRows:
+;MOV.B   #0111b,     P1DIR
+
+	CMP	#1,	R14
+	JZ	ROW1
+	CMP	#2,	R14
+	JZ	ROW2
+	CMP	#3,	R14
+	JZ	ROW3
+	CMP	#4,	R14
+	JZ	ROW4
+	CMP	#5,	R14
+	JZ	ROW5
+	CMP	#6,	R14
+	JZ	ROW6
+	CMP	#7,	R14
+	JZ	ROW7
+	CMP	#8,	R14
+	JZ	ROW8
+        JMP     EndDisplay
+        ;in a perfect world, the next 2 wouldnt be needed. there is an error somewhere
+        ;UPDATE: This is probably fixed now, but it's not worth even removing it at this point.
+        MOV.B   #1,     R14
+        JMP CheckRows
+COL1:
+	MOV.B	#00000000b,	P1OUT
+	JMP 	CheckRows
+COL2:
+	MOV.B	#00000001b,	P1OUT
+	JMP 	CheckRows
+COL3:
+	MOV.B	#00000010b,	P1OUT
+	JMP 	CheckRows
+COL4:
+	MOV.B	#00000011b,	P1OUT
+	JMP 	CheckRows
+COL5:
+	MOV.B	#00000100b,	P1OUT
+	JMP 	CheckRows
+COL6:
+	MOV.B	#00000101b,	P1OUT
+	JMP 	CheckRows
+COL7:
+	MOV.B	#00000110b,	P1OUT
+	JMP 	CheckRows
+COL8:
+	MOV.B	#00000111b,	P1OUT
+	JMP 	CheckRows
+
+;Runs through a inverter to get the ground signal
+;Also pin 2.4 is turned on to enable the decoder that handles voltage in to the matrix
+ROW1:
+	MOV.B	#00010000b, P2OUT
+	JMP 	EndDisplay
+ROW2:
+	MOV.B	#00010001b, P2OUT
+	JMP 	EndDisplay
+ROW3:
+	MOV.B	#00010010b, P2OUT
+	JMP 	EndDisplay
+ROW4:
+	MOV.B	#00010011b, P2OUT
+	JMP 	EndDisplay
+ROW5:
+	MOV.B	#00010100b, P2OUT
+	JMP 	EndDisplay
+ROW6:
+	MOV.B	#00010101b, P2OUT
+	JMP 	EndDisplay
+ROW7:
+	MOV.B	#00010110b, P2OUT
+	JMP 	EndDisplay
+ROW8:
+	MOV.B	#00010111b, P2OUT
+	JMP 	EndDisplay
+	
+EndDisplay:
+
+        MOV.B   #0000b, P1IFG
+	RET
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+CheckFood:
+        ;change the location of the food when the snake head occupies the same space as it.
+	CMP	R4, R5
+	JZ	UpdateFood
+	RET
+	
+UpdateFood:
+        ;values are tied to the length of the snake
+        CMP     #1,     R6
+        JZ      FoodLoc1
+        CMP     #2,     R6
+        JZ      FoodLoc2
+        CMP     #3,     R6
+        JZ      FoodLoc3
+        CMP     #4,     R6
+        JZ      FoodLoc4
+        CMP     #5,     R6
+        JZ      FoodLoc5
+        CMP     #6,     R6
+        JZ      FoodLoc6
+        CMP     #7,     R6
+        JZ      FoodLoc7
+        CMP     #8,     R6
+        JZ      FoodLoc8
+FoodLoc1:
+  MOV   #53,    R5
+  JMP   DonePlaceFood
+FoodLoc2:
+  MOV   #37,    R5
+  JMP   DonePlaceFood
+FoodLoc3:
+  MOV   #15,    R5
+  JMP   DonePlaceFood
+FoodLoc4:
+  MOV   #42,    R5
+  JMP   DonePlaceFood
+FoodLoc5:
+  MOV   #25,    R5
+  JMP   DonePlaceFood
+FoodLoc6:
+  MOV   #74,    R5
+  JMP   DonePlaceFood
+FoodLoc7:
+  MOV   #32,    R5
+  JMP   DonePlaceFood
+FoodLoc8:
+  MOV   #74,    R5
+  JMP   DonePlaceFood
+
+DonePlaceFood:        
+ 
+	CALL	#GrowSnake
+	RET
+	
+CheckBounds:
+	;needs to check 0-9,90-99, and the side edges
+  CMP #8,  R6
+  JZ  CollisionDetected
+	CMP	#0,	R4
+	JZ	CollisionDetected
+	CMP	#1,	R4
+	JZ	CollisionDetected
+	CMP	#2,	R4
+	JZ	CollisionDetected
+	CMP	#3,	R4
+	JZ	CollisionDetected
+	CMP	#4,	R4
+	JZ	CollisionDetected
+	CMP	#5,	R4
+	JZ	CollisionDetected
+	CMP	#6,	R4
+	JZ	CollisionDetected
+	CMP	#7,	R4
+	JZ	CollisionDetected
+	CMP	#8,	R4
+	JZ	CollisionDetected
+	CMP	#9,	R4
+	JZ	CollisionDetected
+	CMP	#10,	R4
+	JZ	CollisionDetected
+	CMP	#19,	R4
+	JZ	CollisionDetected
+	CMP	#20,	R4
+	JZ	CollisionDetected
+	CMP	#29,	R4
+	JZ	CollisionDetected
+	CMP	#30,	R4
+	JZ	CollisionDetected
+	CMP	#39,	R4
+	JZ	CollisionDetected
+	CMP	#40,	R4
+	JZ	CollisionDetected
+	CMP	#49,	R4
+	JZ	CollisionDetected
+	CMP	#50,	R4
+	JZ	CollisionDetected
+	CMP	#59,	R4
+	JZ	CollisionDetected
+	CMP	#60,	R4
+	JZ	CollisionDetected
+	CMP	#69,	R4
+	JZ	CollisionDetected
+	CMP	#70,	R4
+	JZ	CollisionDetected
+	CMP	#79,	R4
+	JZ	CollisionDetected
+	CMP	#80,	R4
+	JZ	CollisionDetected
+	CMP	#89,	R4
+	JZ	CollisionDetected
+	CMP	#90,	R4
+	JZ	CollisionDetected
+	CMP	#91,	R4
+	JZ	CollisionDetected
+	CMP	#92,	R4
+	JZ	CollisionDetected
+	CMP	#93,	R4
+	JZ	CollisionDetected
+	CMP	#94,	R4
+	JZ	CollisionDetected
+	CMP	#95,	R4
+	JZ	CollisionDetected
+	CMP	#96,	R4
+	JZ	CollisionDetected
+	CMP	#97,	R4
+	JZ	CollisionDetected
+	CMP	#98,	R4
+	JZ	CollisionDetected
+	CMP	#99,	R4
+	JZ	CollisionDetected
+	
+CheckSelfCollision:
+;this is supposed to check the head against all other segments, and detect collisions. however, this currently does not work for some reason.
+	CMP SnakeArray+2, R4
+	JZ 	CollisionDetected
+	CMP SnakeArray+4, R4
+	JZ 	CollisionDetected
+	CMP SnakeArray+6, R4
+	JZ 	CollisionDetected
+	CMP SnakeArray+8, R4
+	JZ 	CollisionDetected
+	CMP SnakeArray+10, R4
+	JZ 	CollisionDetected
+	CMP SnakeArray+12, R4
+	JZ 	CollisionDetected
+	CMP SnakeArray+14, R4
+	JZ 	CollisionDetected
+	
+	JMP	DoneCheckingCollisions
+
+CollisionDetected:
+	MOV.B	#1,	R7      ;R7 is being used in the main loop to check if the game needs to be reset or not
+DoneCheckingCollisions:
+	RET
+	
+
+GrowSnake:
+;it has been a long time since i actually worked on this. There is a bug somewhere in this segment, but i am unsure of what exactly the problem is.
+;UPDATE: problem might have been found. a negative sign was missing on the ShiftSegmentDown section. unsure if this is a complete fix 
+
+      ;handle position. if the snake is going in one direction, you want to push the new segment back in the opposite direction.
+      Position:    
+                ;multiply R6 by 2, subtract 1 to get actual direction
+	MOV.B R6,	R11
+	ADD.B R6,	R11
+        DEC.B R11
+	
+        ;copy direction
+        MOV.B SnakeArray(R11), R15
+        MOV.B R11, R14
+        INCD  R11
+        ;
+        CMP   R15,    idirectionRight
+        JZ    ShiftSegmentLeft
+        CMP   R15,    idirectionLeft
+        JZ    ShiftSegmentRight
+        CMP   R15,    idirectionUp
+        JZ    ShiftSegmentDown
+        CMP   R15,    idirectionDown
+        JZ    ShiftSegmentUp
+        
+          
+      ShiftSegmentLeft:
+        MOV.B SnakeArray(R14), SnakeArray(R11)
+        DEC   R14
+        DEC   R11
+        MOV.B SnakeArray(R14), SnakeArray(R11)
+               
+        DEC	SnakeArray(R11)
+                
+        JMP   DirectionSet
+      ShiftSegmentRight:
+                MOV.B SnakeArray(R14), SnakeArray(R11)
+        DEC   R14
+        DEC   R11
+        MOV.B SnakeArray(R14), SnakeArray(R11)
+                
+        INC   SnakeArray(R11)
+        
+        JMP   DirectionSet
+      ShiftSegmentDown:
+        MOV.B SnakeArray(R14), SnakeArray(R11)
+        DEC   R14
+        DEC   R11
+        MOV.B SnakeArray(R14), SnakeArray(R11)
+                
+        ADD.B	#-10,	SnakeArray(R11)
+        JMP     DirectionSet
+      ShiftSegmentUp:
+        MOV.B SnakeArray(R14), SnakeArray(R11)
+        DEC   R14
+        DEC   R11
+        MOV.B SnakeArray(R14), SnakeArray(R11)
+                
+        ADD.B	#10,	SnakeArray(R11)   
+        JMP     DirectionSet
+          
+          
+      DirectionSet:
+      ;direction set isnt needed anymore, it is now handled in the above code segment. 
+      ;it's another case of why bother removing it at this point
+		
+      DoneSnakeGrow:
+          INC	R6                             ;increase length, now that everything is done
+          RET	
+	
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;Update Direction - Uses interrupts to update the register holding the user input
+;                 - Uses Pin 1 interrupt vector
+;                 - The actual enabling of interrupts should be handled in init
+
+P1_ISR: ; update direction register
+	;R9 = current user input. 
+	;0001 = right, 0010 left, 0100 up, 1000 down 
+	
+        
+	CMP.B	#00010000b, P1IFG
+	JZ		DirectionRight
+	CMP.B	#00100000b, P1IFG
+	JZ		DirectionLeft 
+	CMP.B	#01000000b, P1IFG
+	JZ		DirectionUp   
+	CMP.B	#10000000b, P1IFG
+	JZ		DirectionDown 
+	
+	JMP     EndInterrupt	;if 2 buttons pressed, it isnt recognized.
+        
+	DirectionRight:
+		MOV.B	#0001b,	R9
+		JMP 	EndInterrupt
+	DirectionLeft:
+		MOV.B	#0010b,	R9
+		JMP 	EndInterrupt
+	DirectionUp:
+		MOV.B	#0100b,	R9
+		JMP 	EndInterrupt
+	DirectionDown:
+		MOV.B	#1000b,	R9
+		JMP 	EndInterrupt
+	
+	EndInterrupt:
+		MOV.B #00000000b, &P1IFG ;clear all IFG bits (prevents problems with multiple key presses)
+                
+		reti ; Return from ISR       
+	
+
+	
+	COMMON INTVEC ; Interrupt Vectors
+	ORG RESET_VECTOR ; MSP430 RESET
+	
+	
+Vector:
+        ;DW RESET ;
+        ORG PORT1_VECTOR ; P1.x Vector
+        DW P1_ISR 
+     
+        
+        END

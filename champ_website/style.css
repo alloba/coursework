@@ -1,0 +1,167 @@
+.top-title p{
+    position: absolute;
+    /*left: 200px;*/
+    width:100%;
+    height:10%;
+    top:0;
+
+    background: darkcyan;
+    font-family: "Candal", sans-serif;
+    font-size: 50px;
+}
+
+.menu-pane {
+    position:absolute;
+    top: 10%;
+    width: 200px;
+    height: 90%;
+    background: #202024;
+    font-size: 30px;
+    font-family: "Candal", sans-serif;
+}
+
+.search-bar {
+    width: 90%;
+    padding-left: 5px;
+
+    border-radius: 5px;
+    border: none;
+
+    font-size:18px;
+    background-color: #663366;
+    color: #202024;
+
+}
+.menu-pane ul{
+    border-top: 1px solid #636366;
+    list-style:none;
+    margin:0;
+    padding:0;
+
+    font-size: 15px;
+
+}
+.menu-pane li{
+    border-bottom:1px solid #636366;
+    line-height: 45px;
+    padding-left:10px;
+}
+.business-links{
+    font-size: 13px;
+}
+
+
+.champInfoPane {
+    position:relative;
+    left:220px;
+    top: 110px;
+    width:45%;
+    max-width: 1000px;
+    min-width:0;
+    margin-bottom: -100px;
+    display:none;
+
+    background:greenyellow;
+    font-family: Candal sans-serif;
+    font-size: 10px;
+}
+
+.champ-image{
+    display: inline-block;
+    width: 300px;
+    padding: 5px;
+}
+
+.name{
+    position: absolute;
+    left: 320px;
+    top: 10px;
+    font-size: 40px;
+}
+.stats{
+   position: absolute;
+    left:320px;
+    top:40px;
+}
+.search-bar-champ-pane{
+    float: right;
+    margin-right: 10px;
+    margin-top: 530px;
+
+    border-radius: 5px;
+    border: none;
+    padding-left: 5px;
+
+    font-size:18px;
+    //background-color: #663366;
+    color: #202024;
+}
+
+.champComparePane{
+
+    background:greenyellow;
+    font-family: Candal sans-serif;
+    font-size: 10px;
+}
+table{
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+th{
+    text-align:left;
+    font-size:10px;
+    color: blue;
+    border-left: solid black;
+}
+
+td{
+    color:red;
+    padding-right:10px;
+}
+
+.champ-list{
+    position: absolute;
+    left:220px;
+    top: 110px;
+    display:none;
+}
+
+
+p{
+    font-size: 20px;
+    font-weight: bold;
+    margin:0
+}
+
+a{
+    color:#636366;
+    text-decoration: none;
+}
+
+a:hover{
+    color: #77777a;
+}
+body{
+    background: #3f3f3f;
+    margin:0;
+}
+div{
+    margin:0;
+}
+
+.search-bar::-webkit-input-placeholder {
+    color: #1e1e23;
+}
+
+.search-bar:-moz-placeholder { /* Firefox 18- */
+    color: #1e1e23;
+}
+
+.search-bar::-moz-placeholder {  /* Firefox 19+ */
+    color: #1e1e23;
+}
+
+.search-bar:-ms-input-placeholder {
+    color: #1e1e23;
+}
