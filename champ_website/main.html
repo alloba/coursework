@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Candal' rel='stylesheet' type='text/css'>
+
+    <link href="style.css" type="text/css" rel="stylesheet">
+
+    <script src="lolwut.js" type="text/javascript"></script>
+
+    <title>Web project</title>
+
+</head>
+
+
+<body>
+
+<header class="top-title"><p>Champion Select</p></header>
+
+<div class="menu-pane">
+    <ul>
+        <li><input class="search-bar" type="text"
+                   placeholder="search" onkeydown="search_from_menu(this)"></li>
+        <li><a href="">Assassins</a></li>
+        <li><a href="">Fighters</a></li>
+        <li><a href="">Mages</a></li>
+        <li><a href="">Marksmen</a></li>
+        <li><a href="">Support</a></li>
+        <li><a href="">Tank</a></li>
+
+    </ul>
+
+    <ul class="business-links">
+        <li><a href="">About Us</a></li>
+        <li><a href="">League of Legends</a></li>
+    </ul>
+
+</div>
+
+<div class="champInfoPane">
+
+    <img src="" alt="Name" class="champ-image">
+    <p class="name"> Name</p>
+
+    <div class="stats">
+        <div class="starting-stats">
+            <h1>Starting Stats </h1>
+            <table id="starting-stats-table">
+                <tr>
+                    <th>
+                        <p>Hp:</p>
+                    </th>
+                    <td>
+                        <p id="hp"></p>
+                    </td>
+                    <th>
+                        <p>Mana:</p>
+                    </th>
+
+                    <td>
+                        <p id="mp"></p>
+                    </td>
+                    <th>
+                        <p>Movement:</p>
+                    </th>
+                    <td>
+                        <p id="movespeed"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Armor: </p>
+                    </th>
+                    <td>
+                        <p id="armor">
+                    </td>
+                    <th>
+                        <p>Spell Block</p>
+                    </th>
+                    <td>
+                        <p id="spellblock"></p>
+                    </td>
+                    <th>
+                        <p> Attack Range: </p>
+                    </th>
+                    <td>
+                        <p id="attackrange"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Hp Regen: </p>
+                    </th>
+                    <td>
+                        <p id="hpregen"></p>
+
+                    </td>
+                    <th>
+                        <p> Mana Regen: </p>
+                    </th>
+                    <td>
+                        <p id="mpregen"></p>
+                    </td>
+                    <th>
+                        <p> Crit: </p>
+                    </th>
+                    <td>
+                        <p id="crit"></p>
+
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        <p>Attack Damage: </p>
+                    </th>
+                    <td>
+                        <p id="attackdamage"></p>
+
+                    </td>
+                    <th>
+                        <p> Attack Speed: </p>
+                    </th>
+                    <td>
+                        <p id="attackspeedoffset"></p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="per-level-stats">
+        <h1> Stats per level</h1>
+        <table id="perLevelStatsForm">
+
+            <tr>
+                <th>
+                    <p> Hp: </p>
+                </th>
+                <td>
+                    <p id="hpperlevel"></p>
+                </td>
+                <th>
+                    <p> Mana: </p>
+                </th>
+
+                <td>
+                    <p id="mpperlevel"></p>
+                </td>
+                <th>
+                    <p> Armor: </p>
+                </th>
+                <td>
+                    <p id="armorperlevel"></p>
+                </td>
+
+            </tr>
+            <tr>
+                <th>
+                    <p> Spellblock: </p>
+                </th>
+                <td>
+                    <p id="spellblockperlevel"></p>
+                </td>
+                <th>
+                    <p> Hp Regen: </p>
+                </th>
+                <td>
+                    <p id="hpregenperlevel"></p>
+                </td>
+                <th>
+                    <p> Mana Regen: </p>
+                </th>
+                <td>
+                    <p id="mpregenperlevel"></p>
+                </td>
+            </tr>
+
+            <tr>
+
+                <th>
+                    <p> Crit: </p>
+                </th>
+                <td>
+                    <p id="critperlevel"></p>
+                </td>
+                <th>
+                    <p> Attack Damage: </p>
+                </th>
+                <td>
+                    <p id="attackdamageperlevel"></p>
+                </td>
+                <th>
+                    <p> Attack Speed: </p>
+                </th>
+                <td>
+                    <p id="attackspeedperlevel"></p>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+
+    </div>
+
+    <input class="search-bar-champ-pane" type="text"
+               placeholder="Compare Another Champ" onkeydown="search_from_champ_pane(this)">
+</div>
+
+
+<div class="champComparePane" style="position:absolute; top:12%; left:60%; display:none">
+asdasdsddfas
+</div>
+
+
+<div class="champ-list">
+    <p>list area</p>
+</div>
+
+
+</body>
+</html>
